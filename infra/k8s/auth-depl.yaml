@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: auth
-          image: colson0x1/auth
+          # image: colson0x1/auth
+          image: us.gcr.io/tixvibe-dev/auth
 ---
 apiVersion: v1
 kind: Service

@@ -5,10 +5,13 @@ manifests:
   rawYaml:
     - ./infra/k8s/*
 build:
-  local:
-    push: false
+  # local:
+  #   push: false
+  googleCloudBuild:
+    projectId: tixvibe-dev
   artifacts:
-    - image: colson0x1/auth
+    # - image: colson0x1/auth
+    - image: us.gcr.io/tixvibe-dev/auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -26,10 +29,13 @@ build:
 #     manifests:
 #       - ./infra/k8s/*
 # build:
-#   local:
-#     push: false
+#   # local:
+#     # push: false
+#   googleCloudBuild:
+#     projectId: tixvibe-dev
 #   artifacts:
-#     - image: colson0x1/auth
+#   # - image: colson0x1/auth
+#     - image: us.gcr.io/tixvibe-dev/auth
 #       context: auth
 #       docker:
 #         dockerfile: Dockerfile
