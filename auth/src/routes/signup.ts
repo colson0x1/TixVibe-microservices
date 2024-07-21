@@ -17,6 +17,14 @@ router.post(
 
     if (!errors.isEmpty()) {
       // return res.status(400).send(errors.array());
+
+      /* 
+      // Approach with pure JavaScript
+      const error = new Error();
+      error.reasons = errors.array();
+      throw error; */
+      // Create a subclass to get an object like an Error to add in some more custom properties to it
+
       throw new Error('Invalid email or password');
     }
 
