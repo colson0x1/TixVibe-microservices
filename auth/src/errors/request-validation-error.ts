@@ -2,6 +2,8 @@ import { ValidationError } from 'express-validator';
 
 // @ RequestValidationError Subclass
 export class RequestValidationError extends Error {
+  statusCode = 400;
+
   constructor(public errors: ValidationError[]) {
     super();
 
@@ -12,8 +14,39 @@ export class RequestValidationError extends Error {
     // extending a built in class
     Object.setPrototypeOf(this, RequestValidationError.prototype);
   }
+
+  serializeErrors() {
+    // console.log('handling this error as a request validation error')
+    /* const formattedErrors = err.errors.map(error => {
+      return { message: error.msg, field: error.param }
+    }) 
+    return res.status(400).send({ errors: formattedErrors });
+    */
+    // breaking changes in v7 of express-validator library
+
+    // @ Build list of formatted errors
+    // This mapping statement generates that array of objects
+    return this.errors.map((err) => {
+      if (err.type === 'field') {
+        // Now throw that into an object as a value for the errors property
+        // to transform into common error response structure as architected
+        return { message: err.msg, field: err.path };
+      }
+    });
+  }
 }
 
 // @ Uses
 // errors - is list of errors i.e an array of validation errors
 // throw new RequestValidationError(errors);
+
+/* const formattedErrors = err.errors.map((error) => {
+      if (error.type === 'field') {
+        return { message: error.msg, field: error.path };
+      }
+    });
+
+    // `formattedErrors` is now the array of objects
+    // Now throw that into an object as a value for the errors property
+    // to transform into common error response structure as architected
+    return res.status(400).send({ errors: formattedErrors }); */
