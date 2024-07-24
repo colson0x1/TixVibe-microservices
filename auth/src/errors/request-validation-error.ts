@@ -1,11 +1,22 @@
+/* @ Request Validation Error Subclass */
 import { ValidationError } from 'express-validator';
+import { CustomError } from './custom-error';
 
-// @ RequestValidationError Subclass
-export class RequestValidationError extends Error {
+/* interface CustomError {
+  statusCode: number;
+  serializeErrors(): {
+    message: string;
+    field?: string;
+  }[];
+} */
+
+/* export class RequestValidationError extends Error implements CustomError { */
+// export class RequestValidationError extends Error {
+export class RequestValidationError extends CustomError {
   statusCode = 400;
 
   constructor(public errors: ValidationError[]) {
-    super();
+    super('Invalid request parameters');
 
     // @ Only because extending a built in class
     // When using TypeScript and try to extend a class that is built-in to
@@ -32,6 +43,7 @@ export class RequestValidationError extends Error {
         // to transform into common error response structure as architected
         return { message: err.msg, field: err.path };
       }
+      return { message: err.msg };
     });
   }
 }
