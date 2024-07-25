@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 // An interface that describes the properties that are required to create
 // a new User
+// i.e describes what it takes to create a User
 // UserAttrs -> User Attributes
 interface UserAttrs {
   email: string;
@@ -10,8 +11,18 @@ interface UserAttrs {
 }
 
 // An interface that describes the properties that a User Model has
-interface UserModel extends mongoose.Model<any> {
-  build(attrs: UserAttrs): any;
+// i.e describes what the entire collection of Users looks like or at least
+// methods associated with the User Model
+interface UserModel extends mongoose.Model<UserDoc> {
+  build(attrs: UserAttrs): UserDoc;
+}
+
+// An interface that describes the properties that a User Document has
+// i.e describes what properties a single User has
+interface UserDoc extends mongoose.Document {
+  email: string;
+  password: string;
+  // updatedAt: string;
 }
 
 const userSchema = new mongoose.Schema({
@@ -26,16 +37,22 @@ const userSchema = new mongoose.Schema({
 });
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
-}
+};
 
+const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
-const User = mongoose.model<any, UserModel>('User', userSchema);
-
-/* User.build({
+// user is now instance of UserDoc
+/*
+const user = User.build({
   email: 'colson@stillhome.com',
   password: 'password'
-}) */
+})
+user.email;
+user.password;
+user.updatedAt;
+*/
 
+export { User };
 
 // Anytime we create a new user, we're now going to call `buildUser` instead of
 // calling `new User()`
@@ -52,5 +69,3 @@ const buildUser = (attrs: UserAttrs) => {
 
 export { User, buildUser };
 */
-
-export { User };
