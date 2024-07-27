@@ -1,5 +1,6 @@
 /* @ Mongoose User Model */
 import mongoose from 'mongoose';
+import { Password } from '../services/password';
 
 // An interface that describes the properties that are required to create
 // a new User
@@ -35,6 +36,18 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+// middleware fn implemented in Mongoose
+userSchema.pre('save', async function(done) {
+  // Only hash the password if it has been modified
+  if (this.isModified('password')) {
+    // Get the hashed version of the password
+    const hashed = await Password.toHash(this.get('password'))
+    this.set('password', hashed);
+  }
+  done();
+})
+
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
 };
