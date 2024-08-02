@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
-import { body } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 
-import { validateRequest } from '../middlewares/validate-request';
+import { RequestValidationError } from '../errors/request-validation-error';
 
 const router = express.Router();
 
@@ -14,10 +14,7 @@ router.post(
       .notEmpty()
       .withMessage('You must supply a password'),
   ],
-  validateRequest,
   (req: Request, res: Response) => {
-    // @ Error is now handled by validateRequest middleware
-    /* 
     // Gives errors on that ` req`
     const errors = validationResult(req);
 
@@ -25,7 +22,7 @@ router.post(
       // @ Requirement on RequestValidationError is that we need to pass
       // an array of errors
       throw new RequestValidationError(errors.array());
-    } */
+    }
   },
 );
 
