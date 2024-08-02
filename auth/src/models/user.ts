@@ -26,27 +26,44 @@ interface UserDoc extends mongoose.Document {
   // updatedAt: string;
 }
 
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  password: {
-    type: String,
-    required: true,
+  {
+    toJSON: {
+      // Turn User Document into JSON
+      // doc - actual user document
+      // ret - the thing that eventually get turned into JSON
+      // @ directly modify `ret` obj instead of returning a new object
+      transform(doc, ret) {
+        // remap `_id` to `id`
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.password;
+        delete ret.__v; // or - versionKey: false;
+      },
+    },
   },
-});
+);
 
 // middleware fn implemented in Mongoose
-userSchema.pre('save', async function(done) {
+userSchema.pre('save', async function (done) {
   // Only hash the password if it has been modified
   if (this.isModified('password')) {
     // Get the hashed version of the password
-    const hashed = await Password.toHash(this.get('password'))
+    const hashed = await Password.toHash(this.get('password'));
     this.set('password', hashed);
   }
   done();
-})
+});
 
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
