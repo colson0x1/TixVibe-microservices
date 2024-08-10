@@ -8,6 +8,9 @@ let mongo: any;
 // Create an instance of MongoMemoryServer before all of the test setup using
 // hook function
 beforeAll(async () => {
+  /* @ Setting environment variables directly for test environment */
+  process.env.JWT_KEY = 'stillhome';
+
   // Startup MongoDB Memory Server
   /* mongo = new MongoMemoryServer(); */
   // Take a look at the memory server that was just created i.e `mongo` and try
