@@ -47,3 +47,22 @@ it('returns a 400 with missing email and password', async () => {
     })
     .expect(400);
 });
+
+it('disallows duplicate emails', async () => {
+  // Attempt to signup same email and password combination twice in a row
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'colson@amazon.com',
+      password: 'stillhome',
+    })
+    .expect(201);
+
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'colson@amazon.com',
+      password: 'stillhome',
+    })
+    .expect(400);
+});
