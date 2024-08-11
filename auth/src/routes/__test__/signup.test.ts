@@ -53,7 +53,7 @@ it('disallows duplicate emails', async () => {
   await request(app)
     .post('/api/users/signup')
     .send({
-      email: 'colson@amazon.com',
+      email: 'colson@google.com',
       password: 'stillhome',
     })
     .expect(201);
@@ -61,8 +61,21 @@ it('disallows duplicate emails', async () => {
   await request(app)
     .post('/api/users/signup')
     .send({
-      email: 'colson@amazon.com',
+      email: 'colson@google.com',
       password: 'stillhome',
     })
     .expect(400);
+});
+
+it('sets a cookie after successful signup', async () => {
+  // response is same kind of res that we get inside of request handlers
+  const response = await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'colson@google.com',
+      password: 'stillhome',
+    })
+    .expect(201);
+
+  expect(response.get('Set-Cookie')).toBeDefined();
 });

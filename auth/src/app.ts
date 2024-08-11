@@ -25,7 +25,8 @@ app.use(
     signed: false,
     // Require that cookies will only be used if the user is visiting the
     // application over an HTTPS connection
-    secure: true,
+    // secure: true,
+    secure: process.env.NODE_ENV !== 'test',
   }),
 );
 
