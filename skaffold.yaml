@@ -21,6 +21,17 @@ build:
             dest: .
           - src: 'src/**/*.tsx'
             dest: .
+    # - image: colson0x1/client
+    - image: us.gcr.io/tixvibe-dev/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.js'
+            dest: .
+          - src: '**/*.jsx'
+            dest: .
 # @ Old version configuration for Skaffold (skaffold/v2alpha3)
 # apiVersion: skaffold/v2alpha3
 # kind: Config

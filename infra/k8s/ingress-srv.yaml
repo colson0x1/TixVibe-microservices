@@ -18,6 +18,13 @@ spec:
                 name: auth-srv
                 port:
                   number: 3000
+          - path: /?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000
 # @ Old version of ingress-nginx configuration (extensions/v1beta1)
 # apiVersion: extensions/v1beta1
 # kind: Ingress
@@ -34,4 +41,8 @@ spec:
 #           - path: /api/users/?(.*)
 #             backend:
 #               serviceName: auth-srv
+#               servicePort: 3000
+#           - path: /?(.*)
+#             backend:
+#               serviceName: client-srv
 #               servicePort: 3000
