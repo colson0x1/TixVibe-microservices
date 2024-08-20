@@ -1,6 +1,22 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import request from 'supertest';
 import { app } from '../app';
+
+// @ Interface Augumentation
+// Tell TS that there's a global property called signup
+/*
+declare global {
+  namespace NodeJS {
+    interface Global {
+      signin(): Promise<string[]>;
+    }
+  }
+}
+*/
+declare global {
+  var signin: () => Promise<string[]>;
+}
 
 let mongo: any;
 
@@ -59,3 +75,25 @@ afterAll(async () => {
   }
   await mongoose.connection.close();
 });
+
+/* @ Auth Helper */
+// getAuthCookie fn
+global.signin = async () => {
+  const email = 'colson@google.com';
+  const password = 'stillhome';
+
+  const response = await request(app)
+    .post('/api/users/signup')
+    .send({
+      email,
+      password,
+    })
+    .expect(201);
+
+  // Pulling off that authentication cookie which contains JWT inside of it
+  // and including it on the follow up requests setting the headers of the
+  // request so that it works smoothly in the supertest environement
+  const cookie = response.get('Set-Cookie') as string[];
+
+  return cookie;
+};
