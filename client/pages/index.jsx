@@ -3,9 +3,18 @@ import buildClient from '../api/build-client';
 const LandingPage = ({ currentUser }) => {
   // console.log(currentUser);
   // axios.get('/api/users/currentuser').catch((err) => console.log(err.message));
-  console.log(currentUser);
+  // console.log(currentUser);
 
-  return <h1 style={{ color: 'orangered' }}>TixVibe</h1>;
+  return (
+    <>
+      <h1 style={{ color: 'orangered' }}>TixVibe</h1>
+      {currentUser ? (
+        <h1>You are signed in</h1>
+      ) : (
+        <h1>You are NOT signed in</h1>
+      )}
+    </>
+  );
 };
 
 LandingPage.getInitialProps = async (context) => {
