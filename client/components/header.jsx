@@ -1,6 +1,34 @@
 import Link from 'next/link';
 
 const Header = ({ currentUser }) => {
+  const links = [
+    !currentUser && {
+      label: 'Sign In',
+      href: '/auth/signin',
+      className: 'btn-outline-primary me-2',
+    },
+    !currentUser && {
+      label: 'Sign Up',
+      href: '/auth/signup',
+      className: 'btn-primary',
+    },
+    currentUser && {
+      label: 'Sign Out',
+      href: '/auth/signout',
+      className: 'btn-outline-danger',
+    },
+  ]
+    .filter((linkConfig) => linkConfig)
+    .map(({ label, href, className }) => {
+      return (
+        <li key={href} className='nav-item'>
+          <Link href={href} className={`btn ${className}`}>
+            {label}
+          </Link>
+        </li>
+      );
+    });
+
   return (
     <nav className='navbar navbar-light bg-light px-4'>
       <Link className='navbar-brand' href='/'>
@@ -15,29 +43,7 @@ const Header = ({ currentUser }) => {
       </Link>
 
       <div className='d-flex justify-content-end'>
-        <ul className='nav d-flex align-items-center'>
-          {/* {currentUser ? 'Sign out' : 'Sign in/up'} */}
-          {currentUser ? (
-            <li className='nav-item'>
-              <a href='/' className='btn btn-outline-danger'>
-                Sign out
-              </a>
-            </li>
-          ) : (
-            <>
-              <li className='nav-item'>
-                <a href='/' className='btn btn-outline-primary me-2'>
-                  Sign in
-                </a>
-              </li>
-              <li className='nav-item'>
-                <a href='/' className='btn btn-primary'>
-                  Sign up
-                </a>
-              </li>
-            </>
-          )}
-        </ul>
+        <ul className='nav d-flex align-items-center'>{links}</ul>
       </div>
     </nav>
   );
