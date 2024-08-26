@@ -7,7 +7,6 @@ const LandingPage = ({ currentUser }) => {
 
   return (
     <>
-      <h1 style={{ color: 'orangered' }}>TixVibe</h1>
       {currentUser ? (
         <h1>You are signed in</h1>
       ) : (
