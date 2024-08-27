@@ -17,6 +17,8 @@ spec:
           # image: colson0x1/auth
           image: us.gcr.io/tixvibe-dev/auth
           env:
+            - name: MONGO_URI
+              value: 'mongodb://auth-mongo-srv:27017/auth'
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:
