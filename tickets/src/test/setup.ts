@@ -26,6 +26,7 @@ let mongo: any;
 beforeAll(async () => {
   /* @ Setting environment variables directly for test environment */
   process.env.JWT_KEY = 'stillhome';
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
   // Startup MongoDB Memory Server
   /* mongo = new MongoMemoryServer(); */
@@ -52,7 +53,14 @@ beforeEach(async () => {
   // Use mongoose to take a look at all the different connections that exists
   // inside of this `mongo` and delete all those different collections
   // @ Gives us all the collections that exists
-  const collections = await mongoose.connection.db.collections();
+  // const collections = await mongoose.connection.db.collections();
+
+  const db = mongoose.connection.db;
+  if (!db) {
+    throw new Error('Database connection is not established');
+  }
+
+  const collections = await db.collections();
 
   // Loop over them and tell them to delete all the data inside
   // i.e Its just going to reset all of our data in between each test that we run
