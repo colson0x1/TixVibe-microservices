@@ -2,6 +2,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../app';
+import jwt from 'jsonwebtoken';
 
 // @ Interface Augumentation
 // Tell TS that there's a global property called signup
@@ -15,7 +16,7 @@ declare global {
 }
 */
 declare global {
-  var signin: () => Promise<string[]>;
+  var signin: () => string[];
 }
 
 let mongo: any;
@@ -86,22 +87,29 @@ afterAll(async () => {
 
 /* @ Auth Helper */
 // getAuthCookie fn
-global.signin = async () => {
-  const email = 'colson@google.com';
-  const password = 'stillhome';
+global.signin = () => {
+  // Build a JWT payload. { id, email }
+  const payload = {
+    id: '10000000',
+    email: 'colson@google.com',
+  };
 
-  const response = await request(app)
-    .post('/api/users/signup')
-    .send({
-      email,
-      password,
-    })
-    .expect(201);
+  // Create the JWT!
+  const token = jwt.sign(payload, process.env.JWT_KEY!);
 
-  // Pulling off that authentication cookie which contains JWT inside of it
-  // and including it on the follow up requests setting the headers of the
-  // request so that it works smoothly in the supertest environement
-  const cookie = response.get('Set-Cookie') as string[];
+  // Build session object. { jwt: MY_JWT }
+  const session = { jwt: token };
 
-  return cookie;
+  // Turn that session into JSON
+  const sessionJSON = JSON.stringify(session);
+
+  // Take JSON and encode it as base64
+  const base64 = Buffer.from(sessionJSON).toString('base64');
+
+  // return a string thats the cookie with the encoded data
+  // return `express:sess=${base64}`;
+  // return `session=${base64}`;
+  // NOTE: The expectation when using `supertest` library is that, we include
+  // all of the different cookies in an array!
+  return [`session=${base64}`];
 };

@@ -2,8 +2,8 @@ import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
-import { errorHandler, NotFoundError } from '@tixvibe/common';
-import { createTicketRouter } from './routes/new';
+import { errorHandler, NotFoundError, currentUser } from '@tixvibe/common';
+import { createTicketRouter } from './routes/new-ticket';
 
 const app = express();
 // Traffic has been proxied to our application through Ingress NGINX. Express
@@ -24,6 +24,12 @@ app.use(
     secure: process.env.NODE_ENV !== 'test',
   }),
 );
+// Making sure we add this middleware after cookie-session. Because
+// cookie-session has to run first so it can take a look at the cookie and
+// set the `req.session` property else if we don't do that, whenever currentUser
+// runs, it will be running to soon and req.session will not be set
+// So now, if the user is authenticated, that will set the req.currentUser property
+app.use(currentUser);
 
 app.use(createTicketRouter);
 
