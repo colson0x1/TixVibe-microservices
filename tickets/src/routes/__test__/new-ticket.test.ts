@@ -69,4 +69,16 @@ it('returns an error if an invalid price is provided', async () => {
 });
 
 // Make sure everything kind of works as expected
-it('creates a ticket with valid inputs', async () => {});
+// If we successfully create a ticket with valid values and is authenticated,
+// make sure we get status code of 201 indicating ticket was created
+// i.e Write something to make sure ticket was saved to the database
+it('creates a ticket with valid inputs', async () => {
+  // Add in a check to make sure a ticket was saved
+  await request(app)
+    .post('/api/tickets')
+    .send({
+      title: 'coachella',
+      price: 20,
+    })
+    .expect(201);
+});
