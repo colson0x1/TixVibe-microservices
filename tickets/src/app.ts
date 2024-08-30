@@ -4,6 +4,7 @@ import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
 import { errorHandler, NotFoundError, currentUser } from '@tixvibe/common';
 import { createTicketRouter } from './routes/new-ticket';
+import { showTicketRouter } from './routes/show-ticket';
 
 const app = express();
 // Traffic has been proxied to our application through Ingress NGINX. Express
@@ -32,6 +33,7 @@ app.use(
 app.use(currentUser);
 
 app.use(createTicketRouter);
+app.use(showTicketRouter);
 
 /* app.all('*', async (req, res, next) => {
   next(new NotFoundError());
