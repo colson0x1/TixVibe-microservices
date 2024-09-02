@@ -10,6 +10,11 @@ const stan = nats.connect('tixvibe', randomBytes(4).toString('hex'), {
 stan.on('connect', () => {
   console.log('Listener connected to NATS');
 
+  stan.on('close', () => {
+    console.log('NATS connection closed!');
+    process.exit();
+  });
+
   // Second argument to subscribe is the name of the Queue Group that we want
   // to join
   const options = stan.subscriptionOptions().setManualAckMode(true);
@@ -33,3 +38,12 @@ stan.on('connect', () => {
     msg.ack();
   });
 });
+
+// @ Graceful shutdown anytime a Client is about to close down
+// Handlers to watch for any single time that someone tries to close down
+// this process
+// These event handlers are watching for interrupt signals or terminate signals
+// @ SIGINT - Signal Intercept (Ex: rs while running ts-node-dev)
+// @ SIGTERM - Signal Terminate (Ex: killing terminal with Ctrl+C)
+process.on('SIGINT', () => stan.close());
+process.on('SIGTERM', () => stan.close());
