@@ -12,9 +12,11 @@ stan.on('connect', () => {
 
   // Second argument to subscribe is the name of the Queue Group that we want
   // to join
+  const options = stan.subscriptionOptions().setManualAckMode(true);
   const subscription = stan.subscribe(
     'ticket:created',
     'orders-service-queue-group',
+    options,
   );
 
   subscription.on('message', (msg: Message) => {
@@ -27,5 +29,7 @@ stan.on('connect', () => {
         `Received event #${msg.getSequence()}, with data: ${data}`,
       );
     }
+
+    msg.ack();
   });
 });
