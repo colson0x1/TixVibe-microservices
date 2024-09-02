@@ -19,4 +19,32 @@ const stan = nats.connect('tixvibe', 'stillhome', {
 // the NATS streaming server
 stan.on('connect', () => {
   console.log('Publisher connected to NATS');
+
+  // Information we want to share
+  /* const data = {
+    id: '1111',
+    title: 'Tomorrowland',
+    price: 3300
+  } */
+  // Gotcha around NATS: We can only share strings or essentially raw data
+  // We cannot share directly a plain JavaScript object
+  // In order to share this or send it over to NATS Streaming Server, we first
+  // have to convert it into JSON which is a plain string
+  // So essentially all of our data, before we send over to NATS Streaming
+  // Server, we just have to convert it into JSON!
+  const data = JSON.stringify({
+    id: '1111',
+    title: 'Tomorrowland',
+    price: 3300,
+  });
+
+  // First argument to publish is the: subject name or name of the channel
+  // Second argument is the data we want to share
+  // There is this optional third argument which is a callback function. This
+  // fn is going to be invoked after we publish the data
+  stan.publish('ticket:created', data, () => {
+    console.log('Event published');
+  });
+
+  // @ Event is reffered to as message in the world of NATS
 });
