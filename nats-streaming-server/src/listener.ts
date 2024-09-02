@@ -10,7 +10,12 @@ const stan = nats.connect('tixvibe', randomBytes(4).toString('hex'), {
 stan.on('connect', () => {
   console.log('Listener connected to NATS');
 
-  const subscription = stan.subscribe('ticket:created');
+  // Second argument to subscribe is the name of the Queue Group that we want
+  // to join
+  const subscription = stan.subscribe(
+    'ticket:created',
+    'orders-service-queue-group',
+  );
 
   subscription.on('message', (msg: Message) => {
     // console.log('Message received');
