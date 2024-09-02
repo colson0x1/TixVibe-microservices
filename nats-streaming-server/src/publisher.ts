@@ -1,5 +1,7 @@
 import nats from 'node-nats-streaming';
 
+console.clear();
+
 // @ stan -> NATS Project terminology for client
 // NATS is a library
 // stan is am actual instance or a client that is used to connect to
