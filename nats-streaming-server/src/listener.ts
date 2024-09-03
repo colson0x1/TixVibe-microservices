@@ -15,15 +15,28 @@ stan.on('connect', () => {
     process.exit();
   });
 
-  // Second argument to subscribe is the name of the Queue Group that we want
-  // to join
   const options = stan
     .subscriptionOptions()
     .setManualAckMode(true)
-    .setDeliverAllAvailable();
+    // Get list of all the events that has been emitted in the past
+    .setDeliverAllAvailable()
+    // Create Durable Subscription so when event is emitted, NATS is going to
+    // record whether or not the subscription has received and successfully
+    // processed that event!
+    // i.e To make sure that we keep track of all the different events that
+    // have gone to this subscription or the this queue group even if it goes
+    // offline for a little bit
+    .setDurableName('orders-service');
+
+  // Second argument to subscribe is the name of the Queue Group that we want
+  // to join
   const subscription = stan.subscribe(
     'ticket:created',
-    // 'orders-service-queue-group',
+    // Queue group name to make sure we do not accidentally dump the durable
+    // name if all of our services restart for a very brief period of time
+    // and to make sure that all these emitted events only go off to one instance
+    // of our services, even if we are running multiple instances
+    'orders-service-queue-group',
     options,
   );
 
