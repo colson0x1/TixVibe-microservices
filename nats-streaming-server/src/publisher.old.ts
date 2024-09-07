@@ -1,5 +1,4 @@
 import nats from 'node-nats-streaming';
-import { TicketCreatedPublisher } from './events/ticket-created-publisher';
 
 console.clear();
 
@@ -23,13 +22,6 @@ const stan = nats.connect('tixvibe', 'stillhome', {
 stan.on('connect', () => {
   console.log('Publisher connected to NATS');
 
-  const publisher = new TicketCreatedPublisher(stan);
-  publisher.publish({
-    id: '1111',
-    title: 'Tomorrowland',
-    price: 3300,
-  });
-
   // Information we want to share
   /* const data = {
     id: '1111',
@@ -42,19 +34,19 @@ stan.on('connect', () => {
   // have to convert it into JSON which is a plain string
   // So essentially all of our data, before we send over to NATS Streaming
   // Server, we just have to convert it into JSON!
-  /* const data = JSON.stringify({
+  const data = JSON.stringify({
     id: '1111',
     title: 'Tomorrowland',
     price: 3300,
-  }); */
+  });
 
   // First argument to publish is the: subject name or name of the channel
   // Second argument is the data we want to share
   // There is this optional third argument which is a callback function. This
   // fn is going to be invoked after we publish the data
-  /* stan.publish('ticket:created', data, () => {
+  stan.publish('ticket:created', data, () => {
     console.log('Event published');
-  }); */
+  });
 
   // @ Event is reffered to as message in the world of NATS
 });
