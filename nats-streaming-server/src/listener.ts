@@ -15,44 +15,7 @@ stan.on('connect', () => {
     process.exit();
   });
 
-  const options = stan
-    .subscriptionOptions()
-    .setManualAckMode(true)
-    // Get list of all the events that has been emitted in the past
-    .setDeliverAllAvailable()
-    // Create Durable Subscription so when event is emitted, NATS is going to
-    // record whether or not the subscription has received and successfully
-    // processed that event!
-    // i.e To make sure that we keep track of all the different events that
-    // have gone to this subscription or the this queue group even if it goes
-    // offline for a little bit
-    .setDurableName('orders-service');
-
-  // Second argument to subscribe is the name of the Queue Group that we want
-  // to join
-  const subscription = stan.subscribe(
-    'ticket:created',
-    // Queue group name to make sure we do not accidentally dump the durable
-    // name if all of our services restart for a very brief period of time
-    // and to make sure that all these emitted events only go off to one instance
-    // of our services, even if we are running multiple instances
-    'orders-service-queue-group',
-    options,
-  );
-
-  subscription.on('message', (msg: Message) => {
-    // console.log('Message received');
-    const data = msg.getData();
-
-    if (typeof data === 'string') {
-      console.log(
-        // `Received event #${msg.getSequence()}, with data: ${JSON.parse(data)}`,
-        `Received event #${msg.getSequence()}, with data: ${data}`,
-      );
-    }
-
-    msg.ack();
-  });
+  new TicketCreatedListener(stan).listen();
 });
 
 // @ Graceful shutdown anytime a Client is about to close down
@@ -144,5 +107,29 @@ abstract class Listener {
     return typeof data === 'string'
       ? JSON.parse(data)
       : JSON.parse(data.toString('utf8'));
+  }
+}
+
+class TicketCreatedListener extends Listener {
+  subject = 'ticket:created';
+  queueGroupName = 'payments-service';
+
+  // Inside of onMessage, we're presumably going to have some business logic
+  // inside of here. And if the business logic fails for any reason, we want to
+  // just allow this message to time out, to fail, deliver essebtially so that
+  // NATS attempts to redeliver it automatically at some point in the future!
+  // So if everything goes correctly, we're going to call `msg.ack()` to acknowledge
+  // the message otherwise if something goes poorly, we're not going to ack the
+  // message and just allow the message to time out.
+  onMessage(data: any, msg: Message): void {
+    // Inside of here, run whatever business logic we want to run
+    // We can try to take the data, handle it in some fashion, update something
+    // in our database or whatever we need to do
+    //
+    console.log('Event data!', data);
+
+    // This is whats going to actually mark this messsage as successfully
+    // having been parsed
+    msg.ack();
   }
 }
