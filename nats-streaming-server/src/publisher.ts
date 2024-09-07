@@ -20,15 +20,19 @@ const stan = nats.connect('tixvibe', 'stillhome', {
 // So we're gonna listen for the connect event and fn as a second argument
 // The fn will be executed after the client has successfully connected to
 // the NATS streaming server
-stan.on('connect', () => {
+stan.on('connect', async () => {
   console.log('Publisher connected to NATS');
 
   const publisher = new TicketCreatedPublisher(stan);
-  publisher.publish({
-    id: '1111',
-    title: 'Tomorrowland',
-    price: 3300,
-  });
+  try {
+    await publisher.publish({
+      id: '1111',
+      title: 'Tomorrowland',
+      price: 3300,
+    });
+  } catch (err) {
+    console.log(err);
+  }
 
   // Information we want to share
   /* const data = {
