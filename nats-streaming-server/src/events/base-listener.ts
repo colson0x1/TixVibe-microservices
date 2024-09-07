@@ -1,12 +1,26 @@
 import { Message, Stan } from 'node-nats-streaming';
+import { Subjects } from './subjects';
 
-export abstract class Listener {
+/*
+ * @ Interface to describe very generic kind of event
+ * For an object to be considered to be an event, it must have a subject
+ * property that is one of the possible values listed inside of Subjects
+ * Its also going to have a data property whose type is any
+ */
+
+interface Event {
+  subject: Subjects;
+  data: any;
+}
+
+export abstract class Listener<T extends Event> {
   /*
    * @ Abstract Prop: subject
    * @ Type: string
    * @ Goal: Name of the channel this listener is going to listen to
    */
-  abstract subject: string;
+  // abstract subject: string;
+  abstract subject: T['subject'];
   /*
    * @ Abstract Prop: queueGroupName
    * @ Type: string
@@ -18,7 +32,8 @@ export abstract class Listener {
    *  @ Type: (event: EventData) => void
    *  @ Goal: Function to run when a message is received
    */
-  abstract onMessage(data: any, msg: Message): void;
+  // abstract onMessage(data: any, msg: Message): void;
+  abstract onMessage(data: T['data'], msg: Message): void;
   /*
    * @ Prop: client
    * @ Type: Stan
