@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { requireAuth, validateRequest } from '@tixvibe/common';
 import { Ticket } from '../models/ticket';
+import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
 
 const router = express.Router();
 
@@ -40,6 +41,24 @@ router.post(
       userId: req.currentUser!.id,
     });
     await ticket.save();
+    // Right after ticket.save() call, publish an event
+    // Note: We need to pass in active NATS client when we call this
+    // + This is an Asynchronous call
+    new TicketCreatedPublisher(client).publish({
+      id: ticket.id,
+      // `title: title` OR title: `ticket.title`
+      // Note: With Mongoose, we can implement some pre and post save hooks
+      // i.e we can do some validation or sanitization on these values so
+      // the value that came in off the `req.body` is not necessarily the same
+      // as what actually got saved to the database
+      // So it is recommended to pulling the title or all these relevant attributes
+      // directly off of the ticket that was saved to the database as opposed to
+      // pulling the title and price off of the `req.body` because they might
+      // actually be different values
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId,
+    });
 
     res.status(201).send(ticket);
   },
