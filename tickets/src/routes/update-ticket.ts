@@ -7,6 +7,8 @@ import {
   NotAuthorizedError,
 } from '@tixvibe/common';
 import { Ticket } from '../models/ticket';
+import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -59,6 +61,14 @@ router.put(
     // version that's been saved. We already have the updated version right here
     // in this ticket document! So we can continue to rely upon res.send to
     // send back details about this updated ticket!
+
+    new TicketUpdatedPublisher(natsWrapper.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId,
+    });
+
     res.send(ticket);
   },
 );
