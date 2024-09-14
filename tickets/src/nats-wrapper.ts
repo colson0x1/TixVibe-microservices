@@ -24,6 +24,21 @@ class NatsWrapper {
   connect(clusterId: string, clientId: string, url: string) {
     this._client = nats.connect(clusterId, clientId, { url });
 
+    this.client.on('close', () => {
+      console.log('NATS connection closed!');
+      process.exit();
+    });
+
+    // @ Graceful shutdown anytime a Client is about to close down
+    // Handlers to watch for any single time that someone tries to close down
+    // this process
+    // These event handlers are watching for interrupt signals or terminate signals
+    // @ SIGINT - Signal Intercept (Ex: rs while running ts-node-dev)
+    // @ SIGTERM - Signal Terminate (Ex: killing terminal with Ctrl+C)
+    // `this._client!` or alternatively `this.client` which is better way
+    process.on('SIGINT', () => this.client.close());
+    process.on('SIGTERM', () => this.client.close());
+
     /* this._client.on('connect', () => {
       console.log('Connected to NATS')
     }) */
