@@ -20,6 +20,27 @@ const start = async () => {
   // Server in order for it to work successfully!
   try {
     await natsWrapper.connect('tixvibe', 'stillhome', 'htttp://nats-srv:4222');
+    // Exit process entirely anytime we lose connection to NATS Streaming Server
+    natsWrapper.client.on('close', () => {
+      console.log('NATS connection closed!');
+      process.exit();
+    });
+
+    // @ Graceful shutdown anytime a Client is about to close down
+    // Handlers to watch for any single time that someone tries to close down
+    // this process
+    // These event handlers are watching for interrupt signals or terminate signals
+    // @ SIGINT - Signal Intercept (Ex: rs while running ts-node-dev)
+    // @ SIGTERM - Signal Terminate (Ex: killing terminal with Ctrl+C)
+    // i.e Close the client manually as well anytime we get interrupt signal
+    // or terminate singal
+    // `this._client!` or alternatively `this.client` which is better way
+    process.on('SIGINT', () => natsWrapper.client.close());
+    process.on('SIGTERM', () => natsWrapper.client.close());
+
+    /* this._client.on('connect', () => {
+      console.log('Connected to NATS')
+    }) */
 
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
