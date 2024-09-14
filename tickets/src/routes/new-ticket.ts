@@ -3,6 +3,7 @@ import { body } from 'express-validator';
 import { requireAuth, validateRequest } from '@tixvibe/common';
 import { Ticket } from '../models/ticket';
 import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -44,7 +45,7 @@ router.post(
     // Right after ticket.save() call, publish an event
     // Note: We need to pass in active NATS client when we call this
     // + This is an Asynchronous call
-    new TicketCreatedPublisher(client).publish({
+    new TicketCreatedPublisher(natsWrapper.client).publish({
       id: ticket.id,
       // `title: title` OR title: `ticket.title`
       // Note: With Mongoose, we can implement some pre and post save hooks
