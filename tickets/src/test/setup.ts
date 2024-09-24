@@ -19,6 +19,8 @@ declare global {
   var signin: () => string[];
 }
 
+jest.mock('../nats-wrapper');
+
 let mongo: any;
 
 // @ Hook that runs before all of our tests
