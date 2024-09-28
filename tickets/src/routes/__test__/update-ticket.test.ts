@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import { id } from './helper';
+import { natsWrapper } from '../../nats-wrapper';
 
 it('returns a 404 if the provided id does not exist', async () => {
   await request(app)
@@ -144,4 +145,34 @@ it('updates the ticket provided valid inputs', async () => {
 
   expect(ticketResponse.body.title).toEqual('Glastonbury Music Festival');
   expect(ticketResponse.body.price).toEqual(3100);
+});
+
+it('publishes an event', async () => {
+  // @ Successfully edit or update the ticket
+  // Create ticket ahead of time so that we can actually edit it
+  const cookie = global.signin();
+
+  const response = await request(app)
+    .post('/api/tickets')
+    .set('Cookie', cookie)
+    .send({
+      title: 'Glastonbury',
+      price: '31',
+    });
+
+  // Now let's try to edit a ticket
+  await request(app)
+    .put(`/api/tickets/${response.body.id}`)
+    // Setting the exact same cookie on this representing same user is making
+    // the edit
+    .set('Cookie', cookie)
+    .send({
+      title: 'Glastonbury Music Festival',
+      price: 3100,
+    })
+    // Coming out of that, we're going to expect 200
+    .expect(200);
+
+  // @ Make sure publish fn got invoked
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
