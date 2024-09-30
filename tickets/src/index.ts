@@ -11,6 +11,15 @@ const start = async () => {
   if (!process.env.MONGO_URI) {
     throw new Error('MONGO_URI must be defined');
   }
+  if (!process.env.NATS_CLIENT_ID) {
+    throw new Error('NATS_CLIENT_ID must be defined');
+  }
+  if (!process.env.NATS_URL) {
+    throw new Error('NATS_URL must be defined');
+  }
+  if (!process.env.NATS_CLUSTER_ID) {
+    throw new Error('NATS_CLUSTER_ID must be defined');
+  }
 
   // Connect to MongoDB instance successfully through Mongoose before we ever
   // even startup our Express application or technically start listenign to
@@ -19,7 +28,12 @@ const start = async () => {
   // work successfully, it also needs to have a connection to NATS Streaming
   // Server in order for it to work successfully!
   try {
-    await natsWrapper.connect('tixvibe', 'stillhome', 'htttp://nats-srv:4222');
+    // await natsWrapper.connect('tixvibe', 'stillhome', 'htttp://nats-srv:4222');
+    await natsWrapper.connect(
+      process.env.NATS_CLUSTER_ID,
+      process.env.NATS_CLIENT_ID,
+      process.env.NATS_URL,
+    );
     // Exit process entirely anytime we lose connection to NATS Streaming Server
     natsWrapper.client.on('close', () => {
       console.log('NATS connection closed!');
