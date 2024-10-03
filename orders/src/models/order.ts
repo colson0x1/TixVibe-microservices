@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
+import { OrderStatus } from '@tixvibe/common';
 
 // Properties that are required to create an Order
 interface OrderAttrs {
   userId: string;
-  status: string;
+  status: OrderStatus;
   expiresAt: Date;
   // ticket is an instance of TicketDoc
   ticket: TicketDoc;
@@ -12,7 +13,7 @@ interface OrderAttrs {
 // Properties that actually end up on an Order
 interface OrderDoc extends mongoose.Document {
   userId: string;
-  status: string;
+  status: OrderStatus;
   expiresAt: Date;
   // ticket is an instance of TicketDoc
   ticket: TicketDoc;
@@ -38,6 +39,8 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
+      enum: Object.values(OrderStatus),
+      default: OrderStatus.Created,
     },
     expiresAt: {
       type: mongoose.Schema.Types.Date,
