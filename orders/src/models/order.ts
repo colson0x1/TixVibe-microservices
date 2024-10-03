@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { OrderStatus } from '@tixvibe/common';
+import { TicketDoc } from './ticket';
 
 // Properties that are required to create an Order
 interface OrderAttrs {
@@ -10,6 +11,7 @@ interface OrderAttrs {
   ticket: TicketDoc;
 }
 
+// Interface about instance of an Order
 // Properties that actually end up on an Order
 interface OrderDoc extends mongoose.Document {
   userId: string;
