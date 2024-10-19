@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import { OrderStatus } from '@tixvibe/common';
 import { TicketDoc } from './ticket';
 
+export { OrderStatus };
+
 // Properties that are required to create an Order
 interface OrderAttrs {
   userId: string;

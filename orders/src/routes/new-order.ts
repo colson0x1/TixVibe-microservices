@@ -51,6 +51,7 @@ router.post(
     // And if we find the ticket that meets those all crietria, that means the
     // ticket is already reserved and the user who is making this request cannot
     // attempt to reserve the ticket they're trying to reserve!
+    /*
     const existingOrder = await Order.findOne({
       ticket: ticket,
       status: {
@@ -64,6 +65,19 @@ router.post(
     // If we find an `existingOrder`, that means this ticket is already reserved
     // and we want to return early from this route handler
     if (existingOrder) {
+      throw new BadRequestError('Ticket is already reserved');
+    }
+*/
+    // This refactor for above logic is lot easier to read.
+    // Its not really as clear what it means to be reserved so the comment
+    // being right above doesn't make lot of sense so the comments above
+    // should be moved over to Model file to make lot of sense
+    // But this right here is a lot easier to understand whats going on!
+    // We've got a very well named method thats going to tell us with a simple
+    // boolean if a ticket is reserved or not!
+    const isReserved = await ticket.isReserved();
+
+    if (isReserved) {
       throw new BadRequestError('Ticket is already reserved');
     }
 
