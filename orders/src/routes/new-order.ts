@@ -13,6 +13,21 @@ import { Order } from '../models/order';
 
 const router = express.Router();
 
+// Number of seconds before the order expires
+// i.e The window of time user has to pay for this order
+// This is very important setting that dramatically affects how our application
+// behaves and how long user has to purchase the ticket so we might want to
+// extract this even further to ENVIRONMENT VARIABLES which would allow us to
+// make changes to this window of time without having to redeploy the entire
+// application!!
+// We can instead just update the value inside of our Kubernetes config file
+// inside the infra dir
+// Alternatively, we could even get fancier than that and try to save this
+// number of seconds as a record to the database and then put together some
+// kind of web UI that would allow an administrator to change it on the fly.
+// We might even want to have some kind of per user expiration settings.
+const EXPIRATION_WINDOW_SECONDS = 15 * 60;
+
 router.post(
   '/api/orders',
   requireAuth,
@@ -82,11 +97,26 @@ router.post(
     }
 
     //  Calculate an expiration date for this order
+    const expiration = new Date();
+    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS);
 
     // Build the order and save it to the database
+    const order = Order.build({
+      // We're already doing a check to make suer currentUser is defined
+      // with `requireAuth` middleware so we can use ! to force TS not to worry
+      userId: req.currentUser!.id,
+      // Created is the initial status that all orders are going to get
+      status: OrderStatus.Created,
+      expiresAt: expiration,
+      ticket,
+    });
+    // After building the order, Save it to the database
+    await order.save();
 
     // Publish an event saying that an order was created
-    res.send({});
+    // res.send({});
+
+    res.status(201).send(order);
   },
 );
 
