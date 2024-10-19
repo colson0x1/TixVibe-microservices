@@ -47,4 +47,29 @@ it('returns an error if the ticket is already reserved', async () => {
     .expect(400);
 });
 
-it('reserves a ticket', async () => {});
+// We can try to write something that says hey lets reach into the orders
+// collection, make sure there are no orders inside there and then after
+// making a request, take another look at the orders collection and assert
+// that there is at least one order inside
+// Since the request handler does send the order as well
+// i.e. res.status(201).send(order); // new-order.ts
+// So we could potentially also get the response back, take a look at the
+// order that was created and attempt to find it inside the orders collection
+// So lot of different ways we can improve upon this to make sure that the
+// order truly is saved to the database but for right now, 201 is good enough.
+// Hence, we can add in that extra little check to make sure everything is
+// working truly as expected!
+it('reserves a ticket', async () => {
+  const ticket = Ticket.build({
+    title: 'concert',
+    price: 2000,
+  });
+  await ticket.save();
+
+  await request(app)
+    .post('/api/orders')
+    .set('Cookie', global.signin())
+    .send({ ticketId: ticket.id })
+    // Status code 201 indicating that the order was created
+    .expect(201);
+});
