@@ -73,3 +73,5 @@ it('reserves a ticket', async () => {
     // Status code 201 indicating that the order was created
     .expect(201);
 });
+
+it.todo('emits an order created event');
