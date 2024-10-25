@@ -3,6 +3,7 @@ import request from 'supertest';
 import { app } from '../../app';
 import { Order, OrderStatus } from '../../models/order';
 import { Ticket } from '../../models/ticket';
+import { natsWrapper } from '../../nats-wrapper';
 
 // Test for auth
 // Test for body validation i.e provide some valid id for the ticket id in
@@ -74,4 +75,30 @@ it('reserves a ticket', async () => {
     .expect(201);
 });
 
-it.todo('emits an order created event');
+// Whenever a request comes into to create an order, we publish an event
+// saying that an order was created
+// it.('emits an order created event');
+// Make a request to issue/create the order and issue the event and inspect
+// natsWrapper object and make sure that things publish function has been called
+it('emits an order created event', async () => {
+  // Make sure we successfully create an order
+  const ticket = Ticket.build({
+    title: 'concert',
+    price: 2000,
+  });
+  await ticket.save();
+
+  await request(app)
+    .post('/api/orders')
+    .set('Cookie', global.signin())
+    .send({ ticketId: ticket.id })
+    // Status code 201 indicating that the order was created
+    .expect(201);
+
+  // Immediately we get the 201, we should be able to take a look at our
+  // natsWrapper client publish function and just make sure that it has been
+  // invoked!
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  // Test to say that publish function has NOT been invoked
+  // expect(natsWrapper.client.publish).not.toHaveBeenCalled();
+});
