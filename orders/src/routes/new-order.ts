@@ -10,6 +10,8 @@ import {
 import { body } from 'express-validator';
 import { Ticket } from '../models/ticket';
 import { Order } from '../models/order';
+import { OrderCreatedPublisher } from '../events/order-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -114,6 +116,35 @@ router.post(
     await order.save();
 
     // Publish an event saying that an order was created
+    new OrderCreatedPublisher(natsWrapper.client).publish({
+      id: order.id,
+      status: order.status,
+      userId: order.userId,
+      // At code level, expiresAt is a date object inside this file.
+      // Eventually the date object there is going to converted to string
+      // by Mongoose before it gets saved to MongoDB
+      // Here we are goint to provide `expiresAt` as a string because whatever
+      // object we put inside this `publish()` is going to be eventually turned
+      // into JSON
+      // Whenever we put Date object here, its converted to string with
+      // timezone like '02152025:KTM'
+      // Whenever we share timestamp across different services, we want to
+      // communicate them in some kind of timezone agnostic sort of way. So
+      // ideally, we would be providing a UTC timestamp which is giong to work
+      // regardless of what the time zone of the service that is receiving
+      // this event is in.
+      // So rather than relying upon the deafult toString behavior of the
+      // Date object which would end up with the not timezone that we want,
+      // we are going to instead controll how this thing gets turned into a
+      // string. So we are going to provide here toISOString()
+      // That will give us a UTC timestamp/timezone!
+      expiresAt: order.expiresAt.toISOString(),
+      ticket: {
+        id: ticket.id,
+        price: ticket.price,
+      },
+    });
+
     // res.send({});
 
     res.status(201).send(order);
