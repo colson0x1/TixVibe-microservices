@@ -30,12 +30,36 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
     // Its already defined inside of Ticket Model `models/ticket.ts` interface
     // inside of Orders Service
     // So pull off title and price from data
-    const { title, price } = data;
+    /* const { title, price } = data; */
+    // Get the id of the ticket too so that same id can be used to save
+    // in the local ticket collection of Orders Service
+    const { id, title, price } = data;
+
     // Use that to build a new ticket
+    /*
     const ticket = Ticket.build({
       title,
       price,
     });
+    */
+    // That above doesn't work!
+    // That above will create a random ID for the ticket created from
+    // Ticket Service into the local ticket collection of Orders Service
+    // that is listening to the event ticket:created
+    // i.e ticket ID isn't identical whenever replicating data across different
+    // services
+    // So we've to adjust the build function
+    // Adjust the build function in `models/Ticket.ts` to receive `id`
+    // + Also convert the `id` property from ticket that was converted to
+    // `id` from `_id` in JSON while transmitting the event, do convert
+    // the `id` to `_id` from event data so that it will be saved as `_id`
+    // in the local ticket collection of Orders Service in `models/ticket.ts`
+    const ticket = Ticket.build({
+      id,
+      title,
+      price,
+    });
+
     // And then save it
     await ticket.save();
 

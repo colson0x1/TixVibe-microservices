@@ -28,6 +28,7 @@ import mongoose from 'mongoose';
 import { Order, OrderStatus } from './order';
 
 interface TicketAttrs {
+  id: string;
   title: string;
   price: number;
 }
@@ -66,7 +67,26 @@ const ticketSchema = new mongoose.Schema(
 
 // `statics` object is how we add a new method directly to the Ticket model itself
 ticketSchema.statics.build = (attrs: TicketAttrs) => {
-  return new Ticket(attrs);
+  /* return new Ticket(attrs); */
+  // Convert the `id` property from ticket that was converted to
+  // `id` from `_id` in JSON while transmitting the event, do convert
+  // the `id` to `_id` from event data so that it will be saved as `_id`
+  // in the local ticket collection of Orders Service in `models/ticket.ts`
+  // ie. Rather than passing the entire `attrs` object and just allowing it to
+  // assign the ID property, we're going to instead assign all these properties
+  // one by one and as we do, we're going to rename the `_id`
+  // BTW, this manual method is not super idea now because now we're relying
+  // upon listing out each property in great deatail
+  // In another words, if we start to add some different properties to the
+  //`TicketAttrs` interface, we're going to also have to come down to this
+  // `build` method and make sure we assign these properties through as well
+  // And so that's just a little bit of techinical debt
+  return new Ticket({
+    // rename `id` to `_id`
+    _id: attrs.id,
+    title: attrs.title,
+    price: attrs.price,
+  });
 };
 // Add a method directly to a Ticket document itself
 // Example usecase:
