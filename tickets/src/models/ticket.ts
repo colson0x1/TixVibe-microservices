@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 // Properties that are required ti build a new Ticket
 interface TicketAttrs {
@@ -14,6 +15,9 @@ interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
   userId: string;
+  // Make TS understand that an instance of a Ticket has a version property
+  // i.e now we can write `ticket.version` without TS complaining at us
+  version: number;
 }
 
 // Properties tied to the Model
@@ -48,6 +52,13 @@ const ticketSchema = new mongoose.Schema(
     },
   },
 );
+
+// Right after the Ticket schema defination, add in two lines of configurations
+
+// Tell mongoose to track the version of all these different documents using
+// the field `version` instead of default `__v`
+ticketSchema.set('versionKey', 'version');
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 // This is going to be the one and only way that we create new records!
 // Just to make sure we can have TS helping us figure out the different
