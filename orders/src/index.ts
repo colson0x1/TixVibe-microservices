@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
+import { TicketCreatedListener } from './events/listeners/ticket-created-listener';
+import { TicketUpdatedListener } from './events/listeners/ticket-updated-listener';
 
 const start = async () => {
   // Detect error immediately and throw an error when we start to deploy
@@ -55,6 +57,11 @@ const start = async () => {
     /* this._client.on('connect', () => {
       console.log('Connected to NATS')
     }) */
+
+    // Right after we go through all that initialization stuff for NATS, right
+    // after above is a good time to start listening for incoming events
+    new TicketCreatedListener(natsWrapper.client).listen();
+    new TicketUpdatedListener(natsWrapper.client).listen();
 
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
