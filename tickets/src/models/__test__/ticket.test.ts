@@ -1,5 +1,13 @@
 import { Ticket } from '../ticket';
 
+/* @ Optimistic Concurrency Control (OCC)
+ * A Test that's essentially making sure that if we start to make changes to
+ * a record or the same instance of a record in memory, and then we try to
+ * save these things all at the same time, we're giong to make sure that we
+ * only process one of those updates
+ * i.e Test to make sure events are processed in the correct order!
+ * */
+
 it('implements optimistic concurrency control', async () => {
   // Create an instance of a ticket
   const ticket = Ticket.build({
@@ -98,4 +106,33 @@ it('implements optimistic concurrency control', async () => {
   // we're gonna throw an error manually
   // If we return above in the try catch, we would not get to this error
   throw new Error('Should not reach this point');
+});
+
+it('increments the version number on multiple saves', async () => {
+  // Inside of here, we're giong to create a new ticket. We're going to save it.
+  // We're going to expect that the save ticket has a version number of 0.
+  // We'll then go into save the thing a second time and a third time. And
+  // we're going to expect that every single time we save this ticket, the
+  // version number automatically gets incremented.
+  const ticket = Ticket.build({
+    title: 'Glastonbury Festival',
+    price: 2800,
+    userId: '1111',
+  });
+
+  // Right after we save the very first time, we should by default have a version
+  // number equal to 0.
+  await ticket.save();
+  // Here is the expectation for that
+  expect(ticket.version).toEqual(0);
+
+  // We don't even have to make an update. Anytime we save a record, its version
+  // number gets incremented by 1
+  // So we expect that its version number gets incrementd by 1 anytime we save
+  // a record
+  await ticket.save();
+  expect(ticket.version).toEqual(1);
+  await ticket.save();
+  expect(ticket.version).toEqual(2);
+  // expect(ticket.version).toEqual(1);
 });
