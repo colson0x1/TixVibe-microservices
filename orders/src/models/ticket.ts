@@ -24,6 +24,7 @@
 // as it gets saved to the database between these different services.
 
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 // import { OrderStatus } from '@tixvibe/common';
 import { Order, OrderStatus } from './order';
 
@@ -36,6 +37,8 @@ interface TicketAttrs {
 export interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
+  // Make TS don't complain when version is accessed as `ticket.version`
+  version: number;
   isReserved(): Promise<boolean>;
 }
 
@@ -64,6 +67,9 @@ const ticketSchema = new mongoose.Schema(
     },
   },
 );
+
+ticketSchema.set('versionKey', 'version');
+ticketSchema.plugin(updateIfCurrentPlugin);
 
 // `statics` object is how we add a new method directly to the Ticket model itself
 ticketSchema.statics.build = (attrs: TicketAttrs) => {

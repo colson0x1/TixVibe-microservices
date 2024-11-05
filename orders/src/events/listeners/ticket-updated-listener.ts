@@ -11,7 +11,14 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
     // Goal: Find the ticket that is being updated, the ticket that is mentiond
     // inside that `data` object and just update the data and save it
     // Step 1 - Pull the ticket out of our Ticket collection using Ticket Model
-    const ticket = await Ticket.findById(data.id);
+    /* const ticket = await Ticket.findById(data.id); */
+    // Make query based on two different criteria i.e both the `id` and the
+    // `version` number
+    const ticket = await Ticket.findOne({
+      // We want to find a ticket with an id and version number
+      _id: data.id,
+      version: data.version - 1,
+    });
 
     // There is a chance that we will not find the ticket we're looking for
     // i.e ticket: TicketDoc || null
