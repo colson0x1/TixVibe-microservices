@@ -44,6 +44,20 @@ export interface TicketDoc extends mongoose.Document {
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
   build(attrs: TicketAttrs): TicketDoc;
+  // Add in a new query method directely to this model itself thats going to
+  // just facilitate us in doing a query for a `id` plus a `version`
+  // Better method name: @ findByIdAndPreviousVersion
+  // For ease, I've renamed it to: @ findByEvent
+  // The assumption here is that, I'm going to pass some kind of event or
+  // data object. And this method, will pull off the `id` and `version`
+  // properties, subtract 1 from the version and use that to run the same
+  // query that is there before
+  // And to actually implement this method, we have to add a function to
+  // the `statics` object
+  findByEvent(event: {
+    id: string;
+    version: number;
+  }): Promise<TicketDoc | null>;
 }
 
 const ticketSchema = new mongoose.Schema(
@@ -70,6 +84,15 @@ const ticketSchema = new mongoose.Schema(
 
 ticketSchema.set('versionKey', 'version');
 ticketSchema.plugin(updateIfCurrentPlugin);
+
+// Actual implementation in the `statics` object
+ticketSchema.statics.findByEvent = (event: { id: string; version: number }) => {
+  // Run the same query that is inside the listener ticket-created-listener
+  return Ticket.findOne({
+    _id: event.id,
+    version: event.version - 1,
+  });
+};
 
 // `statics` object is how we add a new method directly to the Ticket model itself
 ticketSchema.statics.build = (attrs: TicketAttrs) => {

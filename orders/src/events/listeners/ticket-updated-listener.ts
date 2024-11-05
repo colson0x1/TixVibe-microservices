@@ -14,11 +14,14 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
     /* const ticket = await Ticket.findById(data.id); */
     // Make query based on two different criteria i.e both the `id` and the
     // `version` number
-    const ticket = await Ticket.findOne({
+    /* const ticket = await Ticket.findOne({
       // We want to find a ticket with an id and version number
       _id: data.id,
       version: data.version - 1,
-    });
+    }); */
+    // Using the abstracted method that is implemented direcly within the
+    // Ticket model itself
+    const ticket = await Ticket.findByEvent(data);
 
     // There is a chance that we will not find the ticket we're looking for
     // i.e ticket: TicketDoc || null
