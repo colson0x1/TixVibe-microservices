@@ -83,7 +83,41 @@ const ticketSchema = new mongoose.Schema(
 );
 
 ticketSchema.set('versionKey', 'version');
-ticketSchema.plugin(updateIfCurrentPlugin);
+// ticketSchema.plugin(updateIfCurrentPlugin);
+
+// Not using mongoose-update-if-curernt plugin and using vanilla Mongoose to
+// achieve the same logic
+// Inject some additional criteria on the query that is issued when we try to
+// update a record
+// i.e make sure whenever we write some record to the DB, make sure that
+// we are writing to the correct record i.e record with correct id and version
+// 'pre' save hook is a middleware thats going to run anytime we try to save
+// a record
+// Here inside the hook, we're gonna make sure that we provide the function with
+// the `function` keyword because like many other middlewares in Mongoose,
+// the value of the document that we're trying to save is available inside
+// this function as `this`. And if we use an arrow function here, that would
+// override the value of `this` inside the function, and all of a sudden things
+// would not work as expected
+// We must make use of the `function` keyword
+// This prehook fn is also going to receive a single argument of `done`.
+// `done` is a callback fn that we've to manually invoke once we've done
+// everything we intend to do inside of this middleware
+ticketSchema.pre('save', function (done) {
+  // Tell TS that $where exists so manually ignoring type checking
+  // On latest version of mongoose, the type definition of Mongoose contains
+  // the $where so ts-ignore is not needed
+  // @ts-ignore
+  this.$where = {
+    version: this.get('version') - 1,
+  };
+  // Now, when we reach out to mongodb to save this record, we are not only
+  // gonna say, try to find a record with some appropriate id but also a
+  // version equal to the current version - 1
+  // If we're incrementing our version by 100, then it would be -100 instead
+
+  done();
+});
 
 // Actual implementation in the `statics` object
 ticketSchema.statics.findByEvent = (event: { id: string; version: number }) => {

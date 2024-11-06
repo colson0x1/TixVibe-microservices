@@ -31,8 +31,24 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
 
     // Now that we've found the ticket, we can go through and update presumeably
     // the title and the price
+    /* 
     const { title, price } = data;
-    ticket.set({ title, price });
+    ticket.set({ title, price }); 
+    */
+    // Not relying on mongoose-update-if-current plugin
+    // Make version number of the record in Orders DB as same as the version
+    // number in the  event from another service
+    // Doing so, now we're no longer coupled to this plugins understanding of
+    // how these version numbers increment
+    // Instead we're using the precise version that was included inside
+    // of this data object
+    // So now inside the data object, we could potentially have version numbers
+    // like where they are incremented by 100 every single time or we could
+    // potentially have timestamps. It really doesn't matter. We're just
+    // saying take whatever this new version number is inside this event, assign
+    // it to our record and save it because now that is the current version!
+    const { title, price, version } = data;
+    ticket.set({ title, price, version });
     // Save the updated ticket
     await ticket.save();
 
