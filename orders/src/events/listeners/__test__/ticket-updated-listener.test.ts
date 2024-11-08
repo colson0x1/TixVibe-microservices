@@ -84,3 +84,21 @@ it('acks the message', async () => {
   // Take a look at `ack` fn `onMessage` and make sure it was invoked
   expect(msg.ack).toHaveBeenCalled();
 });
+
+it('does not call ack if the event has a skipped version number', async () => {
+  const { msg, data, listener, ticket } = await setup();
+
+  // Make sure that our data object has a version that is far into the future
+  data.version = 11;
+  /* data.version = 11; */
+
+  try {
+    await listener.onMessage(data, msg);
+  } catch (err) {
+    // We are just using `catch` here to make sure that we do not throw any
+    // error out of this entire test which would automatically cause the
+    // entire thing to fail
+  }
+
+  expect(msg.ack).not.toHaveBeenCalled();
+});
