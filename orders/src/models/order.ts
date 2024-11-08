@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { OrderStatus } from '@tixvibe/common';
 import { TicketDoc } from './ticket';
 
@@ -21,6 +22,12 @@ interface OrderDoc extends mongoose.Document {
   expiresAt: Date;
   // ticket is an instance of TicketDoc
   ticket: TicketDoc;
+  // Mongoose document says, it uses `__v` property which is usually used for
+  // tracking versions
+  // But we are recording versions on a `version` property now
+  // So just we can access that version property, we have to add in this
+  // to this OrderDoc interface and that just makes TypeScript happy and
+  // understand that all orders have a `version` property
   version: number;
 }
 
@@ -64,6 +71,10 @@ const orderSchema = new mongoose.Schema(
     },
   },
 );
+
+orderSchema.set('versionKey', 'version');
+// Tell schema to make use of this mongoose-update-if-current plugin
+orderSchema.plugin(updateIfCurrentPlugin);
 
 // Define `build` method on the Order Schema static's object which is going
 // to give us the build method on the actual Order model
