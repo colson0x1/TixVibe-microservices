@@ -96,7 +96,15 @@ it('creates and saves a ticket', async () => {
 });
 
 // If some valid data object and message is provided then ack the message
+// i.e The goal of this function is to make sure that we actually call the
+// `ack` function
 it('acks the message', async () => {
+  const { data, listener, msg } = await setup();
+
   // call the `onMessage` function with the `data` object + `message` object
+  await listener.onMessage(data, msg);
+
   // write assertions to make sure `ack` function is called!
+  expect(msg.ack).toHaveBeenCalled();
+  // expect(msg.ack).not.toHaveBeenCalled();
 });
