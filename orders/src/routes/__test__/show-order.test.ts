@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../../app';
 // Pull in the Ticket model so that we can create a ticket so we can
@@ -9,6 +10,7 @@ it('fetches the order', async () => {
   // Since there is one ticket, I'll create a ticket directly inline rather
   // than creating a helper function
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 2000,
   });
@@ -56,6 +58,7 @@ it('returns an error if one user tries to fetch another users order', async () =
   // Since there is one ticket, I'll create a ticket directly inline rather
   // than creating a helper function
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 2000,
   });

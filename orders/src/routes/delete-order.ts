@@ -38,6 +38,8 @@ router.delete(
     new OrderCancelledPublisher(natsWrapper.client).publish({
       // On this object, provide some information for the events data
       id: order.id,
+      // Version is going to come off of the order that we just cancelled
+      // and published order cancelled event above
       version: order.version,
       ticket: {
         // id for ticket is tricky here

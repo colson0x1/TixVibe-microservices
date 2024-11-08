@@ -118,6 +118,7 @@ router.post(
     // Publish an event saying that an order was created
     new OrderCreatedPublisher(natsWrapper.client).publish({
       id: order.id,
+      // Include the version for Concurrency Control
       version: order.version,
       status: order.status,
       userId: order.userId,
