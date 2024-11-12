@@ -18,6 +18,7 @@ interface TicketDoc extends mongoose.Document {
   // Make TS understand that an instance of a Ticket has a version property
   // i.e now we can write `ticket.version` without TS complaining at us
   version: number;
+  orderId?: string;
 }
 
 // Properties tied to the Model
@@ -38,6 +39,12 @@ const ticketSchema = new mongoose.Schema(
     userId: {
       type: String,
       required: true,
+    },
+    // Add in the idea of a `orderId` being tied to a ticket
+    orderId: {
+      type: String,
+      // We are not going to mark it as being required because when a ticket is
+      // first created, there is not going to be any order associated with it
     },
   },
   {

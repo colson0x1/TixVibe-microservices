@@ -17,6 +17,7 @@ export class OrderCreatedListener extends Listener {}
 import { Message } from 'node-nats-streaming';
 import { Listener, OrderCreatedEvent, Subjects } from '@tixvibe/common';
 import { queueGroupName } from './queue-group-name';
+import { Ticket } from '../../models/ticket';
 
 // Stick in the event that we want to listen for as a generic argument type for
 // Listener
@@ -30,5 +31,28 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   // And second argument will be the Message type from the node-nats-streaming
   // library
   // onMessage can have some async code inside of it so mark it as async fn
-  async onMessage(data: OrderCreatedEvent['data'], msg: Message) {}
+  async onMessage(data: OrderCreatedEvent['data'], msg: Message) {
+    // Reach onto the Ticket collection and Find the ticket that the order is
+    // reserving
+    const ticket = await Ticket.findById(data.ticket.id);
+    // That is the `ticket` we're trying to reserve
+
+    // If no ticket, throw error
+    // This might happen if the evens flow out of order or something like that.
+    // And maybe we erronously set that a ticket was being reserved when the
+    // ticket didn't even exist
+    if (!ticket) {
+      throw new Error('Ticket not found');
+    }
+
+    // Mark the ticket as being reserved by setting its `orderId` property
+    // data.id is the id of the order that was just created
+    ticket.set({ orderId: data.id });
+
+    // Save the ticket
+    await ticket.save();
+
+    // ack the message
+    msg.ack();
+  }
 }
