@@ -18,6 +18,8 @@ import { Message } from 'node-nats-streaming';
 import { Listener, OrderCreatedEvent, Subjects } from '@tixvibe/common';
 import { queueGroupName } from './queue-group-name';
 import { Ticket } from '../../models/ticket';
+import { TicketUpdatedPublisher } from '../publishers/ticket-updated-publisher';
+/* import { natsWrapper } from '../../nats-wrapper'; */
 
 // Stick in the event that we want to listen for as a generic argument type for
 // Listener
@@ -51,6 +53,28 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
 
     // Save the ticket
     await ticket.save();
+    // Right after we save our ticket, we should publish an event saying that
+    // this ticket was just udpated so all the dependent services can update
+    // their data and version number
+    // i.e That is going to allow our different replicated services or services
+    // that have replicated data to stay in sync
+    /* new TicketUpdatedPublisher(natsWrapper.client); */
+    // Now rather than reaching out to some other files or other class, we
+    // should be just able to access the `client` property on the listener
+    // itself
+    // And now we can access the client, take the client and pass it off to
+    // the TicketUpdatedPublisher and doing that will make testing easier
+    // down the line and also reduces one less direct tie between two
+    // different files inside the project which is a pretty good thing
+    // i.e now we're passing through the `client` that the listener is using
+    await new TicketUpdatedPublisher(this.client).publish({
+      id: ticket.id,
+      price: ticket.price,
+      title: ticket.title,
+      userId: ticket.userId,
+      orderId: ticket.orderId,
+      version: ticket.version,
+    });
 
     // ack the message
     msg.ack();
