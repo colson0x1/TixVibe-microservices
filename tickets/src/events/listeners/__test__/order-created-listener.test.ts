@@ -61,3 +61,41 @@ const setup = async () => {
   // tests
   return { listener, ticket, data, msg };
 };
+
+/* Test Implementation!
+ * Make sure to take the ticket and set its `orderId` property equal to
+ * whatever the `orderId` was out of the data event object
+ * +
+ * Ack the message as soon as everything goes as expected
+ */
+it('sets the userId of the ticket', async () => {
+  const { listener, ticket, data, msg } = await setup();
+
+  await listener.onMessage(data, msg);
+  /* await listener.onMessage(data, msg); */
+
+  // In this case, we want to reach into our database once again. We want to
+  // find the ticket that has presumably been updated inside there. And just
+  // make sure that the ticket has its `orderId` property set
+  // NOTE: the ticket right there above i.e const { ticket } = await setup();
+  // is an out of date ticket document. Presumably we've already written and
+  // updated the version back into our data collection or the collection of
+  // all of our different tickets. So we do have to refetch that thing!
+  // i.e We wanna find the ticket with the same id below as the one we've above
+  // but again we've to refetch that thing because it has some out of date data
+  const updatedTicket = await Ticket.findById(ticket.id);
+
+  // Take a look at the updatedTicket and just make sure that its orderId
+  // property is set
+  // Here, `data.id` is the `id` of the order that we've just created
+  expect(updatedTicket!.orderId).toEqual(data.id);
+});
+
+it('acks the message', async () => {
+  const { listener, ticket, data, msg } = await setup();
+  await listener.onMessage(data, msg);
+  /* await listener.onMessage(data, msg); */
+
+  // Look at the `msg.ack` property and just make sure it was invoked
+  expect(msg.ack).toHaveBeenCalled();
+});
