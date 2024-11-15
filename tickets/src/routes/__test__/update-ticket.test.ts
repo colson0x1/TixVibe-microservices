@@ -1,6 +1,8 @@
 import request from 'supertest';
 import { app } from '../../app';
 import { id } from './helper';
+import mongoose from 'mongoose';
+import { Ticket } from '../../models/ticket';
 import { natsWrapper } from '../../nats-wrapper';
 
 it('returns a 404 if the provided id does not exist', async () => {
@@ -175,4 +177,48 @@ it('publishes an event', async () => {
 
   // @ Make sure publish fn got invoked
   expect(natsWrapper.client.publish).toHaveBeenCalled();
+});
+
+// Test to make sure ticket cannot be edited while its being reserved
+it('rejects updates if the ticket is reserved', async () => {
+  // Create a cookie so we can make a number of requests as one consistent user
+  const cookie = global.signin();
+
+  // Create a ticket
+  const response = await request(app)
+    .post('/api/tickets')
+    .set('Cookie', cookie)
+    .send({
+      title: 'Glastonbury',
+      price: '3100',
+    });
+
+  // In addition, in between the creation and the update, reach directly
+  // into the database, get a handle on the ticket that was created and set
+  // the orderId property on that thing as well
+  // i.e Right after we make initial request (i.e creaeting ticket above), we
+  // are then going to reach in, find our ticket and set the `orderId` property
+  // on it
+  // Here, id of the ticket we're looking for is inside the body of the
+  // response above
+  const ticket = await Ticket.findById(response.body.id);
+  ticket!.set({ orderId: new mongoose.Types.ObjectId().toHexString() });
+  await ticket!.save();
+  // Comment and check if our test is failing as expected
+  /* const ticket = await Ticket.findById(response.body.id);
+  ticket!.set({ orderId: new mongoose.Types.ObjectId().toHexString() });
+  await ticket!.save(); */
+
+  // Make a follow up request to edit ticket
+  await request(app)
+    .put(`/api/tickets/${response.body.id}`)
+    // Setting the exact same cookie on this representing same user is making
+    // the edit
+    .set('Cookie', cookie)
+    .send({
+      title: 'Glastonbury Music Festival',
+      price: 4000,
+    })
+    // Expect the follow up edit to result in a 400 or essentially a bad request
+    .expect(400);
 });

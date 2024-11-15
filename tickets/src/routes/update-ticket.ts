@@ -5,6 +5,7 @@ import {
   NotFoundError,
   requireAuth,
   NotAuthorizedError,
+  BadRequestError,
 } from '@tixvibe/common';
 import { Ticket } from '../models/ticket';
 import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher';
@@ -29,6 +30,26 @@ router.put(
     // If there is not a ticket with that id, throw not authorized error
     if (!ticket) {
       throw new NotFoundError();
+    }
+
+    /*  We have now got this entire ability throug these two listeners
+     *  (order-cancelled-listener & order-created-listener) to somehow
+     *  lock down a ticket and then unlock it later on.
+     *  But at no point do we actually implement any logic to prevent a user
+     *  from editing a ticket that is currently locked down
+     *  -> Add a simple change inside of router file for the update-ticket route
+     *  and make sure that if a ticket is locked down, tell user sorry that you
+     *  cant update this thing */
+    // So right after we find the ticket (i.e above if statement) and it can
+    // be right before (i.e below if statement) or after (i.e below if statement),
+    // we take a look at who owns the ticket. Just somewhere inside of here,
+    // we need to decide whether or not we should allow the ticket to be
+    // edited in case it is actually reserved!
+    // So right after we find the ticket, we decide if the order is reserved
+    // or not in the presence of the `orderId`. If it contains `orderId`
+    // then ticket is reserved else it is unreserved.
+    if (ticket.orderId) {
+      throw new BadRequestError('Cannot edit a reserved ticket');
     }
 
     // Found ticket successfully
