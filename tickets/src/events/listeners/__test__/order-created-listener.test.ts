@@ -99,3 +99,52 @@ it('acks the message', async () => {
   // Look at the `msg.ack` property and just make sure it was invoked
   expect(msg.ack).toHaveBeenCalled();
 });
+
+it('publishes a ticket updated event', async () => {
+  const { listener, ticket, data, msg } = await setup();
+
+  await listener.onMessage(data, msg);
+  /* await listener.onMessage(data, msg); */
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+
+  // Optional
+  // Take a look at the arguments that are provided to the `publish` fn and
+  // make sure that they actually make sense.
+  // i.e make sure that we provide some kind of correct `orderId` and what not
+  // Here TS thinks `publish` is just a normal function but in reality, it is
+  // actually a JEST mock function
+  // Tell TS don't sweat it, we've overwritten the definition of this `publish`
+  // fn. its actually a mock fn so use ts-ignore
+  // @ts-ignore
+  /* console.log(natsWrapper.client.publish.mock.calls); */
+  // [0] means selecting the first element out of the big array. i.e this is
+  // the first invocation of the mock fn and from there, we'll take the
+  // second argument ouf of there i.e [0][1]
+  // @ts-ignore
+  /* console.log(natsWrapper.client.publish.mock.calls[0][1]); */
+  // Help TS understand that `publish` is a mocked fn and also so that we can
+  // get rid of ts-ignore comment
+  // This is going to tell TS that this `publish` is a mock fn and its then
+  // going to give us access to all the different properties that a mock fn
+  // has such as `.mock`, and the `.calls` property on there and a lot of
+  // properties related to mock functions
+  // So this is how we can get TS to play around nicely with the mock functions
+  /* (natsWrapper.client.publish as jest.Mock).mock.calls[0][1]; */
+  // That is going to give us JSON string.
+  // Now parsing that string and the presumably pulling off the `orderId`
+  // property and make sure we emitted some event with the correct `orderId`
+  const ticketUpdatedData = JSON.parse(
+    /* (natsWrapper.client.publish as jest.Mock).mock.calls[0][1], */
+    (natsWrapper.client.publish as jest.Mock).mock.calls[2][1],
+  );
+
+  // Write expectation thats gonna take a look at the `orderId` property on
+  // there and make sure that we gave the correct `orderid`
+  // Here, real `orderId` is the setup function's data object which was meant
+  // to simulate an OrderCreatedEvent. So the data object's `id` property
+  // above is the order id
+  // So comparing data object's `id` against the ticketUpdatedData's `orderId`
+  // property
+  expect(data.id).toEqual(ticketUpdatedData.orderId);
+});
