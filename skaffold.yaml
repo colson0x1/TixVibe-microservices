@@ -19,8 +19,6 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-          - src: 'src/**/*.tsx'
-            dest: .
     # - image: colson0x1/client
     - image: us.gcr.io/tixvibe-dev/client
       context: client
@@ -41,8 +39,6 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-          - src: 'src/**/*.tsx'
-            dest: .
     # - image: colson0x1/orders
     - image: us.gcr.io/tixvibe-dev/orders
       context: orders
@@ -52,7 +48,14 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-          - src: 'src/**/*.tsx'
+    # - image: colson0x1/expiration
+    - image: us.gcr.io/tixvibe-dev/expiration
+      context: expiration
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
             dest: .
 # @ Old version configuration for Skaffold (skaffold/v2alpha3)
 # apiVersion: skaffold/v2alpha3
