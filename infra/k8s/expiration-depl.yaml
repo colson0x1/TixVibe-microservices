@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expiration
+  template:
+    metadata:
+      labels:
+        app: expiration
+    spec:
+      containers:
+        - name: expiration
+          # image: colson0x1/expiration
+          image: us.gcr.io/tixvibe-dev/expiration
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: tixvibe
+            - name: REDIS_HOST
+              value: expiration-redis-srv
+# This service is not going to be contacted by any other part of the
+# application directly. Its also not going to have any network request or
+# http request going directly to the Expiration Service or anything like that.
+# So ClusterIP service is not needed in this scenario for Expiration Service
+# at all!
+# All we really case about in this case is creating the Expiration pod that's
+# going to be running the Expiration Container and that thing is going to
+# communicate with everything else asynchronously through NATS Streaming Server!
