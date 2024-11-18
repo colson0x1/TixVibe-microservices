@@ -1,4 +1,7 @@
 import Queue from 'bull';
+import { ExpirationCompletePublisher } from '../events/publishers/expiration-complete-publisher';
+// Anytime we try to publish an event, we also have to provide NATS client as well
+import { natsWrapper } from '../nats-wrapper';
 
 // Interface that describes the data that we're going to stick into this
 // Job.
@@ -56,12 +59,18 @@ const expirationQueue = new Queue<Payload>('order:expiration', {
 expirationQueue.process(async (job) => {
   // To print orderId, we need to reach into this `job` object, reference the
   // Payload and get the `orderId` property i.e job.data.orderId
+  /*
   console.log(
     'Publish an expiration:complete event for orderId',
     // Here we are getting autocomplete from TS specificly because of the
     // Payload interface. So this is where TS is gonna
     job.data.orderId,
   );
+*/
+
+  new ExpirationCompletePublisher(natsWrapper.client).publish({
+    orderId: job.data.orderId,
+  });
 });
 
 // Export the actual queue that was just created so it can be used in some
