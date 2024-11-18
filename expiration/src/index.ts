@@ -1,4 +1,5 @@
 import { natsWrapper } from './nats-wrapper';
+import { OrderCreatedListener } from './events/listeners/order-created-listener';
 
 const start = async () => {
   // Detect error immediately and throw an error when we start to deploy
@@ -43,6 +44,10 @@ const start = async () => {
     // `this._client!` or alternatively `this.client` which is better way
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
+
+    // After connecting to NATS, start listener by creating an instance of
+    // the listener
+    new OrderCreatedListener(natsWrapper.client).listen();
   } catch (err) {
     console.error(err);
   }
