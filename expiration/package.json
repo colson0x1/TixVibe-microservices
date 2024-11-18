@@ -25,7 +25,7 @@
   "homepage": "https://github.com/colson0x1/tixvibe-microservices#readme",
   "description": "",
   "dependencies": {
-    "@tixvibe/common": "^1.0.9",
+    "@tixvibe/common": "^1.0.10",
     "@types/bull": "^3.15.9",
     "bull": "^4.16.4",
     "node-nats-streaming": "^0.3.2",
