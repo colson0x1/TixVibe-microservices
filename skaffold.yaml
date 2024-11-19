@@ -57,6 +57,15 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    # - image: colson0x1/payments
+    - image: us.gcr.io/tixvibe-dev/payments
+      context: payments
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
 # @ Old version configuration for Skaffold (skaffold/v2alpha3)
 # apiVersion: skaffold/v2alpha3
 # kind: Config
@@ -73,6 +82,15 @@ build:
 #   # - image: colson0x1/auth
 #     - image: us.gcr.io/tixvibe-dev/auth
 #       context: auth
+#       docker:
+#         dockerfile: Dockerfile
+#       sync:
+#         manual:
+#           - src: 'src/**/*.ts'
+#             dest: .
+#   # - image: colson0x1/client
+#     - image: us.gcr.io/tixvibe-dev/client
+#       context: client
 #       docker:
 #         dockerfile: Dockerfile
 #       sync:
