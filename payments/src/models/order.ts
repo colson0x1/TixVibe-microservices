@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { OrderStatus } from '@tixvibe/common';
 
 // List of properties that we need to provide when building an order
@@ -73,6 +74,12 @@ const orderSchema = new mongoose.Schema(
     },
   },
 );
+
+// Right after Order Schema, configure plugin for OCC
+// Tell mongoose to not use `__v` flag and instead go for `version`
+orderSchema.set('versionKey', 'version');
+// Wire up the plugin itself
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
   // Note: the attrs object right above in the argument, is going to have an
