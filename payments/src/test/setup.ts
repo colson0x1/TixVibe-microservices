@@ -16,7 +16,7 @@ declare global {
 }
 */
 declare global {
-  var signin: () => string[];
+  var signin: (id?: string) => string[];
 }
 
 jest.mock('../nats-wrapper');
@@ -89,11 +89,11 @@ afterAll(async () => {
 
 /* @ Auth Helper */
 // getAuthCookie fn
-global.signin = () => {
+global.signin = (id?: string) => {
   // Build a JWT payload. { id, email }
   const payload = {
     // id: '10000000',
-    id: new mongoose.Types.ObjectId().toHexString(),
+    id: id || new mongoose.Types.ObjectId().toHexString(),
     email: 'colson@google.com',
   };
 
