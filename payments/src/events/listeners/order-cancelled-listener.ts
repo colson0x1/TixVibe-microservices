@@ -5,8 +5,8 @@ import {
   OrderStatus,
 } from '@tixvibe/common';
 import { Message } from 'node-nats-streaming';
-import { queueGroupName } from '../queue-group-name';
-import { Order } from '../../../models/order';
+import { queueGroupName } from './queue-group-name';
+import { Order } from '../../models/order';
 
 export class OrderCancelledListener extends Listener<OrderCancelledEvent> {
   subject: Subjects.OrderCancelled = Subjects.OrderCancelled;
