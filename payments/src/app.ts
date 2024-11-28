@@ -3,6 +3,7 @@ import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
 import { errorHandler, NotFoundError, currentUser } from '@tixvibe/common';
+import { createChargeRouter } from './routes/new-charge';
 
 const app = express();
 // Traffic has been proxied to our application through Ingress NGINX. Express
@@ -29,6 +30,8 @@ app.use(
 // runs, it will be running to soon and req.session will not be set
 // So now, if the user is authenticated, that will set the req.currentUser property
 app.use(currentUser);
+
+app.use(createChargeRouter);
 
 /* app.all('*', async (req, res, next) => {
   next(new NotFoundError());
