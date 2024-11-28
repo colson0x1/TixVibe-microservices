@@ -47,7 +47,7 @@ it('updates the status of the order', async () => {
   const { listener, data, msg, order } = await setup();
 
   /* await listener.onMessage(data, msg); */
-  /* await listener.onMessage(data, msg); */
+  await listener.onMessage(data, msg);
 
   // Refetch the order out of the db and make sure its status was updated to
   // cancelled
