@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
+import { OrderCancelledListener } from './events/listeners/order-cancelled-listener';
+import { OrderCreatedListener } from './events/listeners/order-created-listener';
 
 const start = async () => {
   // Detect error immediately and throw an error when we start to deploy
@@ -52,10 +54,12 @@ const start = async () => {
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
 
-    // Right after NATS connection stuff, create an instnace of both of those
+    // Right after NATS connection stuff, create an instance of both of those
     // listeners and pass in natsWrapper client
     // NOTE: Just creating an instance is not enough. Its the listen method/function
     // that actually tells the listener to start listening for incoming events
+    new OrderCreatedListener(natsWrapper.client).listen();
+    new OrderCancelledListener(natsWrapper.client).listen();
 
     /* this._client.on('connect', () => {
       console.log('Connected to NATS')
