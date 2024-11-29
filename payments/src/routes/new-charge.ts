@@ -8,6 +8,7 @@ import {
   NotAuthorizedError,
   OrderStatus,
 } from '@tixvibe/common';
+import { stripe } from '../stripe';
 import { Order } from '../models/order';
 
 const router = express.Router();
@@ -53,6 +54,18 @@ router.post(
     // in all those 3 scenarios.
     // + Its hectic with Postman to test all of these but its ease with
     // automated tests
+
+    // Create a charge and bill user for some amount of money
+    await stripe.charges.create({
+      currency: 'usd',
+      // We need to convert $ into cents for the amount
+      amount: order.price * 100,
+      // We also need to provide source for this charge i.e where the money
+      // is gonna come from. And that's gonna be a token that is incoming
+      // into our request handler!
+      source: token,
+    });
+
     res.send({ success: true });
   },
 );
