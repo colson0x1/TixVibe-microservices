@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: payments
-          # image: colson0x1/payments
-          image: us.gcr.io/tixvibe-dev/payments
+          image: colson0x1/tixvibe-payments
+          # image: us.gcr.io/tixvibe-dev/payments
           env:
             - name: NATS_CLIENT_ID
               valueFrom:

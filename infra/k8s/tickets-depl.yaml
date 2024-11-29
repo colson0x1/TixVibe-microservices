@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: tickets
-          # image: colson0x1/tickets
-          image: us.gcr.io/tixvibe-dev/tickets
+          image: colson0x1/tixvibe-tickets
+          # image: us.gcr.io/tixvibe-dev/tickets
           env:
             - name: NATS_CLIENT_ID
               valueFrom:
