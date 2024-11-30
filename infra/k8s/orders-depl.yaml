@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: orders
-          image: colson0x1/tixvibe-orders
-          # image: us.gcr.io/tixvibe-dev/orders
+          # image: colson0x1/tixvibe-orders
+          image: us.gcr.io/tixvibe-dev/orders
           env:
             - name: NATS_CLIENT_ID
               valueFrom:

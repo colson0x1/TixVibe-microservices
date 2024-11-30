@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: auth
-          image: colson0x1/tixvibe-auth
-          # image: us.gcr.io/tixvibe-dev/auth
+          # image: colson0x1/tixvibe-auth
+          image: us.gcr.io/tixvibe-dev/auth
           env:
             - name: MONGO_URI
               value: 'mongodb://auth-mongo-srv:27017/auth'

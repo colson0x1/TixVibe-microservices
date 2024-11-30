@@ -5,13 +5,13 @@ manifests:
   rawYaml:
     - ./infra/k8s/*
 build:
-  local:
-    push: false
-  # googleCloudBuild:
-  #   projectId: tixvibe-dev
+  # local:
+  # push: false
+  googleCloudBuild:
+    projectId: tixvibe-dev
   artifacts:
-    - image: colson0x1/tixvibe-auth
-      # - image: us.gcr.io/tixvibe-dev/auth
+    # - image: colson0x1/tixvibe-auth
+    - image: us.gcr.io/tixvibe-dev/auth
       context: auth
       docker:
         dockerfile: Dockerfile
@@ -19,8 +19,8 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: colson0x1/tixvibe-client
-      # - image: us.gcr.io/tixvibe-dev/client
+    # - image: colson0x1/tixvibe-client
+    - image: us.gcr.io/tixvibe-dev/client
       context: client
       docker:
         dockerfile: Dockerfile
@@ -30,8 +30,8 @@ build:
             dest: .
           - src: '**/*.jsx'
             dest: .
-    - image: colson0x1/tixvibe-tickets
-      # - image: us.gcr.io/tixvibe-dev/tickets
+    # - image: colson0x1/tixvibe-tickets
+    - image: us.gcr.io/tixvibe-dev/tickets
       context: tickets
       docker:
         dockerfile: Dockerfile
@@ -39,8 +39,8 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: colson0x1/tixvibe-orders
-      # - image: us.gcr.io/tixvibe-dev/orders
+    # - image: colson0x1/tixvibe-orders
+    - image: us.gcr.io/tixvibe-dev/orders
       context: orders
       docker:
         dockerfile: Dockerfile
@@ -48,8 +48,8 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: colson0x1/tixvibe-expiration
-      # - image: us.gcr.io/tixvibe-dev/expiration
+    # - image: colson0x1/tixvibe-expiration
+    - image: us.gcr.io/tixvibe-dev/expiration
       context: expiration
       docker:
         dockerfile: Dockerfile
@@ -57,8 +57,8 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: colson0x1/tixvibe-payments
-      # - image: us.gcr.io/tixvibe-dev/payments
+    # - image: colson0x1/tixvibe-payments
+    - image: us.gcr.io/tixvibe-dev/payments
       context: payments
       docker:
         dockerfile: Dockerfile

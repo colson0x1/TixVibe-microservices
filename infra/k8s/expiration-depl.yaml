@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: expiration
-          image: colson0x1/tixvibe-expiration
-          # image: us.gcr.io/tixvibe-dev/expiration
+          # image: colson0x1/tixvibe-expiration
+          image: us.gcr.io/tixvibe-dev/expiration
           env:
             - name: NATS_CLIENT_ID
               valueFrom:
