@@ -21,6 +21,16 @@ declare global {
 
 jest.mock('../nats-wrapper');
 
+// It is recommended to store API keys inside of environment variables in
+// .env file
+// Also note that, this environement variable is not placed next to all of
+// the others like down inside of beforeAll fn. The reason for that is, we
+// have to define this Stripe API key as soon as possible because its going
+// to be used the instant that we first require in the `stripe.ts` file
+// inside of our `/src` directory!
+process.env.STRIPE_KEY =
+  'sk_test_51OLe4rBpFhorp6S6vqSf8XIevzem27RhmqBQFn2FfBOrSgt79DnB6uV1kJ7DG9Is3w3spWEp8EgMb0t8iTOTDyGG00zmQdNyr3';
+
 let mongo: any;
 
 // @ Hook that runs before all of our tests

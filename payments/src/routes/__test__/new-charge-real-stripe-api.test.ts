@@ -5,10 +5,6 @@ import { app } from '../../app';
 import { Order } from '../../models/order';
 import { stripe } from '../../stripe';
 
-// Redirect the import to the `stripe.ts`, and instead use the mocked version
-// of `stripe.ts` located under __mocks__
-jest.mock('../../stripe');
-
 // Make sure to throw an error if we try to purchase an order that doesn't
 // exist
 it('returns a 404 when purchasing an order that does not exist', async () => {
@@ -164,30 +160,11 @@ it('returns a 204 with valid inputs', async () => {
     // payment actually was created
     .expect(201);
 
-  // Make sure that the mock create fn was called
+  // Those expectations in the mock stripe test is assuming that we are working
+  // with a mock function but now, its going to make a real reqeuest to the
+  // Stripe API
 
-  // Make sure it was called with the correct arguments
-  // We can take  a look at all the times it was called i.e `.calls` which
-  // is gonna be an array of arrays. So we could take a look at the first
-  // time it was called i.e `.calls[0]` and then for that first time, we could
-  // take a look at the first argument like so i.e `.calls[0][0]`
-  const chargeOptions = (stripe.charges.create as jest.Mock).mock.calls[0][0];
-  // Now chargeOptions is going to be, back inside the route handler i.e
-  // `new-charge.ts`
-  // Its going to be this object
-  // {
-  //  currency: 'usd',
-  //  amount: order.price * 100,
-  //  source: token
-  // }
-  // So we can make sure this object has the correct properties. We can make
-  // sure it has the appropriate currency, the correct amount and the the
-  // correct token as well.
-  // So here are three expectations to make sure all those properties are
-  // set correctly.
-  expect(chargeOptions.source).toEqual('tok_visa');
-  // Amount we're charging should be whatever amount or price is listed on the
-  // order above times 100
-  expect(chargeOptions.amount).toEqual(20 * 100);
-  expect(chargeOptions.currency).toEqual('usd');
+  // Reach out to the Stripe API and make sure that we actually are creating
+  // a charge with all the correct attributes.
+  // i.e Make sure that a charge was created
 });
