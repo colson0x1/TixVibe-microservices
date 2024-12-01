@@ -10,6 +10,7 @@ import {
 } from '@tixvibe/common';
 import { stripe } from '../stripe';
 import { Order } from '../models/order';
+import { Payment } from '../models/payment';
 
 const router = express.Router();
 
@@ -72,7 +73,7 @@ router.post(
     });
     */
     // Create a charge and bill user for some amount of money
-    await stripe.charges.create({
+    const charge = await stripe.charges.create({
       currency: 'usd',
       // We need to convert $ into cents for the amount
       amount: order.price * 100,
@@ -81,6 +82,11 @@ router.post(
       // into our request handler!
       source: token,
     });
+    const payment = Payment.build({
+      orderId,
+      stripeId: charge.id,
+    });
+    await payment.save();
 
     // Above resolution works fine!
     // Error: StripeInvalidRequestError: You cannot accept payments using
