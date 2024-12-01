@@ -7,7 +7,7 @@ import {
 import { Message } from 'node-nats-streaming';
 import { queueGroupName } from './queue-group-name';
 import { Order } from '../../models/order';
-import { OrderCancelledPublisher } from '../order-cancelled-publisher';
+import { OrderCancelledPublisher } from '../publishers/order-cancelled-publisher';
 import { natsWrapper } from '../../nats-wrapper';
 
 export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent> {
@@ -27,6 +27,25 @@ export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent
     // Check if order is defined
     if (!order) {
       throw new Error('Order not found');
+    }
+
+    // Right now, whenever we receive a message (i.e msg), we're going to
+    // find the corresponding order no matter what
+    // (i.e const order = await Order.findById(...))
+    // and always mark the order as being cancelled below.
+    // And as we can imagine, there might be a kind of big downside to this.
+    // Like what would happen if we received a cancellation event around an
+    // order that has already been paid for.
+    // Well, chances are we would take this order that has already been paid
+    // for or be marked as complete and cancel it anyways.
+    // So we do have to add in a little check here and just make sure that
+    // we do not try to cancel an order that has been paid for right after
+    // our little check above to make sure that we have an order.
+    // So here, we will say that if order status property is equal to complete,
+    // then lets just return early and ack the message because we do not wanna
+    // do anything with this cancellation event.
+    if (order.status === OrderStatus.Complete) {
+      return msg.ack();
     }
 
     // Update the status
