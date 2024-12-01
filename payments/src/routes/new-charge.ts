@@ -122,6 +122,9 @@ router.post(
     // So for now, I'm just returning the id of the payment that was created.
     /* res.status(201).send({ success: true }); */
     res.status(201).send({ id: payment.id });
+    // We could also write a test around the above line and make sure that the
+    // id that is being sent back is the same as the payment that was actually
+    // saved to the database.
 
     // Above resolution works fine!
     // Error: StripeInvalidRequestError: You cannot accept payments using
