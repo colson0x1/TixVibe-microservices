@@ -11,6 +11,8 @@ import {
 import { stripe } from '../stripe';
 import { Order } from '../models/order';
 import { Payment } from '../models/payment';
+import { PaymentCreatedPublisher } from '../events/publishers/payment-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -82,11 +84,44 @@ router.post(
       // into our request handler!
       source: token,
     });
+    // payment record relates charge and order together
     const payment = Payment.build({
       orderId,
       stripeId: charge.id,
     });
+    // Uncomment to test payment creation
+    /* await payment.save(); */
     await payment.save();
+    // If we await this, then we're going to make sure that we await to publish
+    // the event before we send a response back.
+    /* await new PaymentCreatedPublisher(natsWrapper.client).publish({ */
+    // Alternatively, we could remove the await and just say, hey, let's just
+    // send back a response as soon as possible and we're not going to worry
+    // about handling or waiting for the event to be published.
+    new PaymentCreatedPublisher(natsWrapper.client).publish({
+      id: payment.id,
+      // For orderId, we could direct use the `orderId` destructured from the
+      // `req.body` but for best practices, we really like to take information
+      // directly off of the record i.e payment defined above, that we just
+      // saved instead. Because who knows, we might be making some adjustment
+      // to the orderId, we might be changing it in some fashion. Same with
+      // the stripeId. Obviously I'm not doing above but its usually just
+      // best practice to take information off the record we just saved
+      // because we don't know if there's something kind of massaging that
+      // information before it actually gets stored inside the database.
+      // So for the orderId, we're going to use payment.orderId
+      orderId: payment.orderId,
+      stripeId: payment.stripeId,
+    });
+
+    // Return some meaningful data than just a success: true, like maybe
+    // the entire payment object or maybe just the payment object id.
+    // Really in this case, just about any return value is totally fine
+    // because we're not really gonna make use of this information at any
+    // point in time inside of our React application.
+    // So for now, I'm just returning the id of the payment that was created.
+    /* res.status(201).send({ success: true }); */
+    res.status(201).send({ id: payment.id });
 
     // Above resolution works fine!
     // Error: StripeInvalidRequestError: You cannot accept payments using
@@ -114,7 +149,7 @@ router.post(
       payment_method_types: ['card'],
     });
     */
-    res.status(201).send({ success: true });
+    /* res.status(201).send({ success: true }); */
   },
 );
 

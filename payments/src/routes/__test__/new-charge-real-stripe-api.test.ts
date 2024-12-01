@@ -4,6 +4,7 @@ import { OrderStatus } from '@tixvibe/common';
 import { app } from '../../app';
 import { Order } from '../../models/order';
 import { stripe } from '../../stripe';
+import { Payment } from '../../models/payment';
 
 // Make sure to throw an error if we try to purchase an order that doesn't
 // exist
@@ -210,6 +211,7 @@ it('returns a 204 with valid inputs', async () => {
 
   // Test to make sure that we create a charge with the appropriate amount
   // assigned to it
+  // stripeCharge is either going to be some stripeCharge or undefined
   expect(stripeCharge).toBeDefined();
   // We could take a deeper look at the stripeCharge object and make some
   // more accersions around it. For example, we could make sure that it has
@@ -222,6 +224,29 @@ it('returns a 204 with valid inputs', async () => {
   // i.e expect(stripeCharge).toBeDefined();
   // TS just doesn't really know how to interpret that line.
   expect(stripeCharge!.currency).toEqual('usd');
+
+  // Test payment creation
+  // So after we made sure that Stripe charge was actually created above,
+  // we'll just take a look in our payment collection and just make sure
+  // that a payment was actually created and saved with a given stripeId
+  // or alternatively with the given orderId. Either one will be fine.
+  const payment = await Payment.findOne({
+    orderId: order.id,
+    // We already checked for the existence of this variable stripeCharge
+    // on: expect(stripeCharge).toBeDefined()
+    // So stripeCharge!
+    stripeId: stripeCharge!.id,
+  });
+  // Write expectation to make sure that we actually find a payment
+  /* expect(payment).toBeDefined(); */
+  // That above line will always evalutes successfully or truthfully
+  // Because payment is either the payment we're looking for or NULL
+  // And both of those are going to pass the expectation for toBeDefined()
+  // because that above line is looking for a value to be undefined
+  // So because payment is either going to be a payment or null, we need to
+  // specifically say that we expect this thing not to be null.
+  // so using the matcher `.not.toBeNull()`
+  expect(payment).not.toBeNull();
 
   // We could either use the mock version or the Real version for Stripe.
   // Real version is a little bit slower to run but it definitely is far
