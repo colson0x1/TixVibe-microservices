@@ -129,6 +129,8 @@ it('returns a 204 with valid inputs', async () => {
   // Now use that above userId to build up a new order and we'll assign this
   // as the userId for the order itself!
 
+  const price = Math.floor(Math.random() * 100000);
+
   // Create a real order and save it to the DB
   const order = Order.build({
     // For the id, we do want this thing to look realistic
@@ -138,7 +140,8 @@ it('returns a 204 with valid inputs', async () => {
     userId,
     // Hardcode the version to be 0
     version: 0,
-    price: 3300,
+    // price: 3300,
+    price,
     // Update the status to Created to make sure we can pay for this order
     status: OrderStatus.Created,
   });
@@ -167,4 +170,67 @@ it('returns a 204 with valid inputs', async () => {
   // Reach out to the Stripe API and make sure that we actually are creating
   // a charge with all the correct attributes.
   // i.e Make sure that a charge was created
+
+  /* @ Test Approach */
+  // Make a request from test file to route handler and include token and
+  // orderId.
+  // Route handler will create a charge requesting to the Stripe API and Stripe
+  // API will send details about the charge in response back to the route
+  // handler.
+  // Route handler is going to respond success: true to the test file.
+  // Make test file make a separate request to Stripe API after receiving a
+  // success: true response back from the route handler.
+  // -> Request a lit of 10 most recently charges that have been created.
+  // Use currency as a unique identifier to identify a charge among the list
+  // of 10 most recent charges and make it unique by randomly generating the
+  // price for the order.
+  // During expectation, if a charge is found in list of charges during
+  // iteration with that same randomly generated amount/price, then charge
+  // is successfully created inside the new-charge route handler and at no
+  // point in time, theres need of change for the implementation of code
+  // i.e no need to change the return value of the route handler just to
+  // better suite the test.
+
+  // The limit that we use here really just comes down to how often we expect
+  // to be running multiple copies of this test suite at the same time.
+  // If for some reason, we're running 10 copies of this test suite at the
+  // same time, if we rely upon the default value of limit: 10, as opposed
+  // to 50, then its possible that when we go to fetch our list of charges,
+  // we might accidentelly push out the charts that we are looking for.
+  // So by increasing this to 50, it pretty much reduces the chance of that to
+  // near zero.
+  const stripeCharges = await stripe.charges.list({ limit: 50 });
+  // Iterate over Stripe charges data and try to find the appropriate charge.
+  // https://docs.stripe.com/api/charges/list
+  const stripeCharge = stripeCharges.data.find((charge) => {
+    // For every charge, iterate over each one and return true for the first
+    // charge that has an amount property equal to our price times 100.
+    return charge.amount === price * 100;
+  });
+
+  // Test to make sure that we create a charge with the appropriate amount
+  // assigned to it
+  expect(stripeCharge).toBeDefined();
+  // We could take a deeper look at the stripeCharge object and make some
+  // more accersions around it. For example, we could make sure that it has
+  // the appropriate currency. We can make sure that its got the correct
+  // somehow inspect the token or something like that.
+  // Here, just taking a look at the currency is enough!
+  // It is possible for a stripeCharge to be undefined because we're using
+  // `find` statement above. So ! to tell TS don't sweat it. We techincally
+  // are checking to make sure that the value is defined on the line above.
+  // i.e expect(stripeCharge).toBeDefined();
+  // TS just doesn't really know how to interpret that line.
+  expect(stripeCharge!.currency).toEqual('usd');
+
+  // We could either use the mock version or the Real version for Stripe.
+  // Real version is a little bit slower to run but it definitely is far
+  // more realistic and makes sure that our code is working as expected!
+  // The other nice thing in real version here is that, we can add in a
+  // different token, so maybe a completely invalid token, and we can make
+  // sure that our route handler handles that in some appropriate fashion.
+  // It might be kind of hard to test out an invaid token if we were mocking
+  // out the API because we might not really know how to interpret a response
+  // from the API or how the API is really going to respond if we give an
+  // invalid token.
 });

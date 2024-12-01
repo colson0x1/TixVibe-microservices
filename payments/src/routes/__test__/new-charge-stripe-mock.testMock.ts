@@ -122,9 +122,23 @@ it('returns a 400 when purchasing a cancelled order', async () => {
     .set('Cookie', global.signin(userId))
     .send({
       orderId: order.id,
-      token: 'stillhome',
+      token: 'tok_visa',
     })
     .expect(400);
+
+  // Debug
+  /*
+  console.log('Order before request:', await Order.findById(order.id));
+  const response = await request(app)
+    .post('/api/payments')
+    .set('Cookie', global.signin(userId))
+    .send({
+      orderId: order.id,
+      token: 'tok_visa',
+    });
+  console.log('Response status:', response.status);
+  console.log('Response body:', response.body);
+  */
 });
 
 // HTTP code 204 because we're technically creating a record here
@@ -190,6 +204,6 @@ it('returns a 204 with valid inputs', async () => {
   expect(chargeOptions.source).toEqual('tok_visa');
   // Amount we're charging should be whatever amount or price is listed on the
   // order above times 100
-  expect(chargeOptions.amount).toEqual(20 * 100);
+  expect(chargeOptions.amount).toEqual(3300 * 100);
   expect(chargeOptions.currency).toEqual('usd');
 });

@@ -55,6 +55,22 @@ router.post(
     // + Its hectic with Postman to test all of these but its ease with
     // automated tests
 
+    // @ Uncomment this code below where we create the charge to TEST the
+    // test fail. This ensures that now we are not creating a charge at all
+    // and that means when we try to go and get our list of most recent
+    /*
+    // charges, we should not find one with the appropriate price.
+    // Create a charge and bill user for some amount of money
+    await stripe.charges.create({
+      currency: 'usd',
+      // We need to convert $ into cents for the amount
+      amount: order.price * 100,
+      // We also need to provide source for this charge i.e where the money
+      // is gonna come from. And that's gonna be a token that is incoming
+      // into our request handler!
+      source: token,
+    });
+    */
     // Create a charge and bill user for some amount of money
     await stripe.charges.create({
       currency: 'usd',
@@ -66,6 +82,32 @@ router.post(
       source: token,
     });
 
+    // Above resolution works fine!
+    // Error: StripeInvalidRequestError: You cannot accept payments using
+    // this API as it is no longer supported!
+    // New updates docs!!
+    // https://stripe.com/docs/payments/payment-intents
+    // For real Stripe TEST (i.e if not using mock version), slight different
+    // changes has to be made.
+    // Also, we don't put anymore the token but only the `orderId`
+    // {
+    //    orderId: 'a98sdjosd0sdsoks09sjoka9'
+    // }
+    // Which then will work in Postman!
+    // {
+    //    "success": true
+    // }
+    /*
+    await stripe.paymentIntents.create({
+      currency: 'usd',
+      // We need to convert $ into cents for the amount
+      amount: order.price * 100,
+      // We also need to provide source for this charge i.e where the money
+      // is gonna come from. And that's gonna be a token that is incoming
+      // into our request handler!
+      payment_method_types: ['card'],
+    });
+    */
     res.status(201).send({ success: true });
   },
 );
