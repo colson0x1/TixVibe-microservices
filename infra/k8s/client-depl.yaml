@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: client
-          # image: colson0x1/tixvibe-client
-          image: us.gcr.io/tixvibe-dev/client
+          image: colson0x1/tixvibe-client
+          # image: us.gcr.io/tixvibe-dev/client
 ---
 apiVersion: v1
 kind: Service
