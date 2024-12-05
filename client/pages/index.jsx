@@ -1,4 +1,4 @@
-import buildClient from '../api/build-client';
+// import buildClient from '../api/build-client';
 
 const LandingPage = ({ currentUser }) => {
   // console.log(currentUser);
@@ -16,12 +16,20 @@ const LandingPage = ({ currentUser }) => {
   );
 };
 
-LandingPage.getInitialProps = async (context) => {
+// Now its going to be really easy for us to fetch some data using the
+// `client` argument or `currentUser` without having to make a follow up
+// request to fetch the current user (i.e inside of Landing Page getInitialProps
+// fn) AND without having to import the `buildClient` function to build up
+// a client inside the getInitialProps here!
+LandingPage.getInitialProps = async (context, client, currentUser) => {
+  /*
   console.log('LANDING PAGE!');
   const client = buildClient(context);
   const { data } = await client.get('/api/users/currentuser');
 
   return data;
+  */
+  return {};
 };
 
 export default LandingPage;

@@ -6,7 +6,7 @@ const AppComponent = ({ Component, pageProps, currentUser }) => {
   return (
     <div>
       <Header currentUser={currentUser} />
-      <Component {...pageProps} />
+      <Component currentUser={currentUser} {...pageProps} />
     </div>
   );
 };
@@ -17,6 +17,8 @@ AppComponent.getInitialProps = async (appContext) => {
   // console.log(appContext);
 
   const client = buildClient(appContext.ctx);
+  // This endpoint: `/api/users/currentUser`, gives back an object that has
+  // the `currentUser` property in it which refers to the current user
   const { data } = await client.get('/api/users/currentuser');
   // Get set of pageProps/componentProps i.e this is gonna be the set of data
   // that we're trying to fetch from the components or the individual pages
@@ -24,8 +26,17 @@ AppComponent.getInitialProps = async (appContext) => {
   // const pageProps = await appContext.Component.getInitialProps(appContext.ctx);
   // Handle when getInitialProps is undefineds Example on signin/signup page
   let pageProps = {};
+  // Child components getInitialProps fn invocation
   if (appContext.Component.getInitialProps) {
-    pageProps = await appContext.Component.getInitialProps(appContext.ctx);
+    // Pass client that we've already build above to child component's
+    // `getInitialProps` invocation as a second argument
+    // + Also, get the `currentUser` and provide as a third argument to
+    // child components `getInitialProps` fn invocation
+    pageProps = await appContext.Component.getInitialProps(
+      appContext.ctx,
+      client,
+      data.currentUser,
+    );
   }
 
   // console.log(pageProps);
