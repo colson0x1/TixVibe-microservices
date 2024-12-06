@@ -13,6 +13,14 @@ const Header = ({ currentUser }) => {
       className: 'btn-primary',
     },
     currentUser && {
+      label: 'Sell Tickets',
+      href: '/tickets/new',
+    },
+    currentUser && {
+      label: 'My Orders',
+      href: '/orders',
+    },
+    currentUser && {
       label: 'Sign Out',
       href: '/auth/signout',
       className: 'btn-outline-danger',
