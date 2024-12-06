@@ -1,18 +1,35 @@
 // import buildClient from '../api/build-client';
 
-const LandingPage = ({ currentUser }) => {
+const LandingPage = ({ currentUser, tickets }) => {
   // console.log(currentUser);
   // axios.get('/api/users/currentuser').catch((err) => console.log(err.message));
   // console.log(currentUser);
+  // console.log(tickets);
+
+  // Helper variable where Im looping over my array of tickets and building up
+  // a separate row for each ticket
+  const ticketList = tickets.map((ticket) => {
+    return (
+      <tr key={ticket.id}>
+        <td>{ticket.title}</td>
+        <td>{ticket.price}</td>
+      </tr>
+    );
+  });
 
   return (
-    <>
-      {currentUser ? (
-        <h1>You are signed in</h1>
-      ) : (
-        <h1>You are NOT signed in</h1>
-      )}
-    </>
+    <div>
+      <h1>Tickets</h1>
+      <table className='table'>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>{ticketList}</tbody>
+      </table>
+    </div>
   );
 };
 
@@ -29,7 +46,19 @@ LandingPage.getInitialProps = async (context, client, currentUser) => {
 
   return data;
   */
-  return {};
+  // return {};
+
+  // Whenever we make use of Axios to fetch some data, which is what this client
+  // really is, we get back a big `res` or `response` object and the actual data
+  // that we care about is nested on the `data` property.
+  const { data } = await client.get('/api/tickets');
+
+  // Return an object with a key of tickets and refer to that data
+  // This returned object right here, everything inside of here, is giong to be
+  // merged into the props that are being passed to the Landing Page i.e because
+  // this object has a key of `tickets`, we can now receive this prop as
+  // `tickets` inside of the actual component
+  return { tickets: data };
 };
 
 export default LandingPage;
