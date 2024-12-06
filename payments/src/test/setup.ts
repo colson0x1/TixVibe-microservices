@@ -29,7 +29,7 @@ jest.mock('../nats-wrapper');
 // to be used the instant that we first require in the `stripe.ts` file
 // inside of our `/src` directory!
 process.env.STRIPE_KEY =
-  'sk_test_51OLe4rBpFhorp6S6vqSf8XIevzem27RhmqBQFn2FfBOrSgt79DnB6uV1kJ7DG9Is3w3spWEp8EgMb0t8iTOTDyGG00zmQdNyr3';
+  'sk_test_51QT4SwAJag3ZAtFpcH1M5uO9L4wF1EAusAlnSVoy8ZFnXvFJ6fCciUrISPLDaRA7A76MxUsYUatJQShLMXn5Drup00GGLV9Ikj';
 
 let mongo: any;
 
