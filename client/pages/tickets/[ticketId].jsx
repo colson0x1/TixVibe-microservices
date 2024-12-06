@@ -1,3 +1,4 @@
+import Router from 'next/router';
 import useRequest from '../../hooks/use-request';
 
 const TicketShow = ({ ticket }) => {
@@ -11,7 +12,21 @@ const TicketShow = ({ ticket }) => {
     // onSuccess is going to be invoked with whatever response we get back
     // from the request
     // So in this case, hopefully it will be the `order` that was created
-    onSuccess: (order) => console.log(order),
+    // onSuccess: (order) => console.log(order),
+    // We want to navigate a user over to the OrderShow Component whenever
+    // onSuccess callback gets invoked cause that's the point at which we know
+    // that, hey, order has been created. We should now navigate the user
+    // over and show them details about this order.
+    // onSuccess is going to be called with the order that was just created
+    // i.e We have already access to the id of the 0rder
+    // NOTE: Its different when programatically navigating over to the
+    // wildcard route
+    // First argument now is, essentially the path to the file inside of pages
+    // dir i.e `/orders/[orderId]`
+    // Second argument is, the actual url that we're tryna go to i.e
+    // order/ the real id of the order i.e `{/orders/${order.id}}`
+    onSuccess: (order) =>
+      Router.push('/orders/[orderId]', `/orders/${order.id}`),
   });
 
   return (
