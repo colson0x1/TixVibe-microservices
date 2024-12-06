@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import StripeCheckout from 'react-stripe-checkout';
+import Router from 'next/router';
 import useRequest from '../../hooks/use-request';
 
 const OrderShow = ({ order, currentUser }) => {
@@ -13,7 +14,10 @@ const OrderShow = ({ order, currentUser }) => {
       // by the use-request hook
     },
     // We're going to receive response as payment object
-    onSuccess: (payment) => console.log(payment),
+    // onSuccess: (payment) => console.log(payment),
+    // Redirect user over to the big list of orders. They should hopefully
+    // see that the order they had just created marked as complete.
+    onSuccess: (payment) => Router.push('/orders'),
   });
 
   useEffect(() => {
