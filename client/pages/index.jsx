@@ -1,4 +1,5 @@
 // import buildClient from '../api/build-client';
+import Link from 'next/link';
 
 const LandingPage = ({ currentUser, tickets }) => {
   // console.log(currentUser);
@@ -13,6 +14,21 @@ const LandingPage = ({ currentUser, tickets }) => {
       <tr key={ticket.id}>
         <td>{ticket.title}</td>
         <td>{ticket.price}</td>
+        <td>
+          {/* Here, `href` kind of describes the generic or the general route 
+          without any customized ids or anything like that. Then we seperately
+          provide `as` prop and that is the real URL that we are trying to
+          navigate to */}
+          {/* <Link href='/ticket/[ticketId]' as={`/tickets/${ticket.id}`}> */}
+          <Link
+            href={{
+              pathname: 'tickets/[ticketId]',
+              query: { ticketId: ticket.id },
+            }}
+          >
+            View
+          </Link>
+        </td>
       </tr>
     );
   });
@@ -25,6 +41,7 @@ const LandingPage = ({ currentUser, tickets }) => {
           <tr>
             <th>Title</th>
             <th>Price</th>
+            <th>Link</th>
           </tr>
         </thead>
         <tbody>{ticketList}</tbody>
