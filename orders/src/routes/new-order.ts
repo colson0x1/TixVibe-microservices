@@ -28,7 +28,7 @@ const router = express.Router();
 // number of seconds as a record to the database and then put together some
 // kind of web UI that would allow an administrator to change it on the fly.
 // We might even want to have some kind of per user expiration settings.
-const EXPIRATION_WINDOW_SECONDS = 15 * 60;
+const EXPIRATION_WINDOW_SECONDS = 5 * 60;
 
 router.post(
   '/api/orders',
