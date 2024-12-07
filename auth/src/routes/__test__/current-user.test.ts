@@ -22,6 +22,14 @@ it('responds with details about the current user', async () => {
     .get('/api/users/currentuser')
     .set('Cookie', cookie)
     .send()
+    // .expect(200);
+    // Make a change to this TEST to make a breaking change so that its
+    // reflected on the PR
+    // This will cause our test suite to fail
+    // + Imagine that maybe along with this failing test, we also wrote out
+    // some other code inside of our project that we would want to eventually
+    // deploy
+    /* .expect(400); */
     .expect(200);
 
   // console.log(response.body);
