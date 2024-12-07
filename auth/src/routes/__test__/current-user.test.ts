@@ -29,7 +29,8 @@ it('responds with details about the current user', async () => {
     // + Imagine that maybe along with this failing test, we also wrote out
     // some other code inside of our project that we would want to eventually
     // deploy
-    .expect(400);
+    /* .expect(400); */
+    .expect(200);
 
   // console.log(response.body);
 
