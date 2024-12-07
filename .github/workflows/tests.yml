@@ -1,0 +1,34 @@
+name: tests
+
+# This `on` section is going to determine when we're going to run this workflow
+on:
+  # We want to run this workflow anytime a PR is created
+  pull_request
+
+# This `jobs` section thing is going to define some number of things that we
+# want to do whenever a PR is created, reopened or updated
+# In particular, we want to start up some kind of virtual machine or really
+# it is a container, we're going to be running on the ubuntu operating system
+# and the first thing we want to do inside of our little script is, take all
+# the code out of our project. That's what this `uses` step right here does.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # We're then going to setup a series of commands to run inside of our
+      # project. So we put another array entry here with `run` and then we're
+      # going to put in a command that is going to run all the tests inside
+      # of just our Auth service.
+      # NOTE: we can't just run `npm run test` because whenever we run our
+      # test inside of this Github environment, we need to make sure that our
+      # test suite exists automatically at some point in time. So right now,
+      # our `npm run test` command is going to start up JEST inside the
+      # watcher mode. So its gonna run continuously just watching for changes
+      # to be made to our source code. We do not want that when we're running
+      # our tests on GitHub. We want just one run of our test suite and we
+      # want to exit entirely. So rather than running `npm run test` directly,
+      # we're going to instead create a new script called `test:ci` that is
+      # going to run our test suite exactly one time and then automatically
+      # exit.
+      - run: cd auth && npm install && npm run test:ci
