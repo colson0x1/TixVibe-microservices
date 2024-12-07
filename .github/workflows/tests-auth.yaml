@@ -1,4 +1,4 @@
-name: tests
+name: tests-auth
 
 # This `on` section is going to determine when we're going to run this workflow
 on:
@@ -32,3 +32,20 @@ jobs:
       # going to run our test suite exactly one time and then automatically
       # exit.
       - run: cd auth && npm install && npm run test:ci
+      # There's two steps that we can run test inside of all other services
+      # We can either add in some additional `run` statements.
+      # That is one way to do it. But that is gonna make sure that we run
+      # all of our tests in series. In other words, we're gonna run all the
+      # tests for the auth service first, and then expiration, and then orders
+      # and tickets and so on. In total, it might end up taking several minutes
+      # to run all the different tests for our project.
+      # But there's technically another way, that we can wireup all these
+      # testing workflows to make them all run in paralle.
+      # We can create some additional workflows that also executes on the
+      # `on pull_request` event. And for each of these additional workflows
+      # we create, we'll have them change into each of our other individual
+      # services and run tests inside them.
+      # So essentially for each individual service, we can create a different
+      # Github action and thats gonna make sure that they all run in parallel
+      # or essentially at the same time which is going to dramatically speed
+      # up our testing process.
