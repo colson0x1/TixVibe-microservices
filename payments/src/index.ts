@@ -5,6 +5,7 @@ import { OrderCancelledListener } from './events/listeners/order-cancelled-liste
 import { OrderCreatedListener } from './events/listeners/order-created-listener';
 
 const start = async () => {
+  console.log('Starting...');
   // Detect error immediately and throw an error when we start to deploy
   // our code
   if (!process.env.JWT_KEY) {
