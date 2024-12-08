@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import { app } from './app';
 
 const start = async () => {
-  console.log('Starting up...');
   // Detect error immediately and throw an error when we start to deploy
   // our code
   if (!process.env.JWT_KEY) {
