@@ -7,6 +7,7 @@ import { ExpirationCompleteListener } from './events/listeners/expiration-comple
 import { PaymentCreatedListener } from './events/listeners/payment-created-listener';
 
 const start = async () => {
+  console.log('Starting...');
   // Detect error immediately and throw an error when we start to deploy
   // our code
   if (!process.env.JWT_KEY) {
