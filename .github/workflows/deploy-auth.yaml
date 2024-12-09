@@ -31,3 +31,23 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       # Now we are authenticated with Docker so now we push the image
       - run: docker push colson0x1/tixvibe-auth
+      # Install doctl into running Github container
+      - uses: digitalocean/action-doctl@v2
+        with:
+          # This token will be provided to the above script that installs doctl
+          # and we're going to get back a preinitialized version of doctl, all
+          # ready to go for us.
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      # Use doctl to get the Kubernetes config and save it inside our local
+      # machine i.e in this case, inside the container.
+      # tixvibe is the name of the Kubernetes Cluster on Digital Ocean
+      - run: doctl kubernetes cluster kubeconfig save tixvibe
+      # That should give us a pre initialized copy or all the context
+      # information we need and shove it into kubectl. It should also make
+      # that the active context on kubectl as well.
+      # So that point on, we should be able to issue commands to kubectl and
+      # have them be executed against our cluster inside of Digital Ocean.
+
+      # Now, we have to tell our deployment to update itself and use the
+      # latest image that we just pushed off to Docker Hub.
+      - run: kubectl rollout restart deployment auth-depl
