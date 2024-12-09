@@ -1,0 +1,33 @@
+name: deploy-auth
+
+on:
+  # Whenever we close or merge a PR, that actually counts as a push directly
+  # to the master/main branch. SO this check right here is going to run this
+  # workflow whenever we merge a PR into the master/main branch.
+  # Its also only going to run if it contains a change to something inside of
+  # the `auth` directory.
+  push:
+    branches:
+      - main
+    paths:
+      - 'auth/**'
+
+jobs:
+  # build is the name of the job id
+  # A better naming convention (test workflow should have a job id of test)
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out all of our code inside of our repo
+      - uses: actions/checkout@v2
+      - run: cd auth && docker build -t colson0x1/tixvibe-auth .
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        # Those enivironment variable aren't automatically added into this
+        # as a environment variable instead, we have to tell Github that we
+        # want those two secrets to be added as sepcifically environment
+        # variable call DOCKER_USERNAME and DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      # Now we are authenticated with Docker so now we push the image
+      - run: docker push colson0x1/tixvibe-auth
