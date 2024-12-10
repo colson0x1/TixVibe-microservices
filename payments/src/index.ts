@@ -1,3 +1,5 @@
+/* @ Payments Service */
+
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
@@ -5,6 +7,7 @@ import { OrderCancelledListener } from './events/listeners/order-cancelled-liste
 import { OrderCreatedListener } from './events/listeners/order-created-listener';
 
 const start = async () => {
+  console.log('Starting Payments Service...');
   // Detect error immediately and throw an error when we start to deploy
   // our code
   if (!process.env.JWT_KEY) {

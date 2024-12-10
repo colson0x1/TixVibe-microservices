@@ -1,3 +1,5 @@
+/* @ Orders Service */
+
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './nats-wrapper';
@@ -7,6 +9,7 @@ import { ExpirationCompleteListener } from './events/listeners/expiration-comple
 import { PaymentCreatedListener } from './events/listeners/payment-created-listener';
 
 const start = async () => {
+  console.log('Starting Orders Service...');
   // Detect error immediately and throw an error when we start to deploy
   // our code
   if (!process.env.JWT_KEY) {
