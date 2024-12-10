@@ -17,4 +17,5 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - run: doctl kubernetes cluster kubeconfig save tixvibe
       # Apply all those config files that are placed into the `k8s` dir
-      - run: kubectl apply -f infra/k8s
+      # Also apply everything from `k8s/prod` folder as well
+      - run: kubectl apply -f infra/k8s && kubectl apply -f infra/k8s-prod
