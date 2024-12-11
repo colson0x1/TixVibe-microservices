@@ -1,4 +1,4 @@
-# **💎 TixVibe Microservices**
+# \*_💎 TixVibe Microservices_ Monorepo\*
 
 **TixVibe Microservices** is an advanced, distributed event-ticketing platform designed with the scalability, resilience, and efficiency needed to handle millions of users, built with best practices and patterns inspired by industry leaders like Google, Meta, Amazon, and Uber.
 
@@ -20,7 +20,7 @@ This project follows microservices architecture and modern distributed system pr
 
 ## **Table of Contents**
 
-- [**💎 TixVibe Microservices**](#-tixvibe-microservices)
+- [**💎 TixVibe Microservices Monorepo**](#-tixvibe-microservices)
   - [**Table of Contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Architecture Overview**](#architecture-overview)
