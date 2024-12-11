@@ -3,7 +3,17 @@ name: tests-auth
 # This `on` section is going to determine when we're going to run this workflow
 on:
   # We want to run this workflow anytime a PR is created
-  pull_request
+  pull_request:
+    # Inside of here, we want to say that, we only want to run this job right
+    # here if a PR request has been issued and that PR contains any changes
+    # specifically related to the `auth` directory!
+    # i.e Service specific test
+    # Now if there's ever a PR, a PR gets reopened or making an update to the
+    # existing PR and the files changed are inside the auth directory. Those
+    # specifically any files inside the auth dir. If antything inside the auth
+    # dir gets changed, then run the job, otherwise don't run anything at all.
+    paths:
+      - 'auth/**'
 
 # This `jobs` section thing is going to define some number of things that we
 # want to do whenever a PR is created, reopened or updated
