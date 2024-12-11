@@ -6,11 +6,15 @@ This project follows microservices architecture and modern distributed system pr
 
 ![tixvibe microservices](https://i.imgur.com/4D8YzgF.png)
 
-![tixvibe microservices](https://i.imgur.com/awAHZiw.png)
-
 ![tixvibe microservices](https://i.imgur.com/NGeWBY1.png)
 
+![tixvibe microservices](https://i.imgur.com/awAHZiw.png)
+
 ![tixvibe microservices](https://i.imgur.com/HUZetG7.png)
+
+![tixvibe microservices](https://i.imgur.com/gMlwJDW.png)
+
+![tixvibe microservices](https://i.imgur.com/oP90GFC.png)
 
 ---
 
@@ -268,7 +272,7 @@ This shared library allows developers to focus on core business logic without du
 
 ## **Links and References**
 
-- [TixVibe GitHub Repository](https://github.com/tixvibe/tixvibe-microservices)
+- [TixVibe Monorepo](https://github.com/tixvibe/tixvibe-microservices)
 - [TixVibe Common Repository](https://github.com/colson0x1/common)
 - [@tixvibe/common NPM](https://www.npmjs.com/package/@tixvibe/common)
 
@@ -277,6 +281,10 @@ This shared library allows developers to focus on core business logic without du
 ## Screenshots
 
 ![tixvibe microservices](https://i.imgur.com/NGeWBY1.png)
+
+![tixvibe microservices](https://i.imgur.com/gMlwJDW.png)
+
+![tixvibe microservices](https://i.imgur.com/oP90GFC.png)
 
 ![tixvibe microservices](https://i.imgur.com/awAHZiw.png)
 
