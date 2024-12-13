@@ -1,0 +1,25 @@
+# Owner of the entire repository
+# This rule gives full ownership over the main branch to the repository owner
+/main/* @colson0x1
+
+# Default ownership for all files to the repository owner
+# This is a fallback rule, meaning if no other rule applies, @colson0x1 will be the default owner
+* @colson0x1
+
+# Delegate ownership of specific areas to respective teams
+# These teams will review changes in these specific directories or files
+microfrontends/* @microfrontends-team # Microfrontends team
+microservices/* @microservices-team # Microservices team
+# Docs Team # Docs team
+docs/* @docs-team
+.github/workflows/* @ci-cd-team  # Ownership for CI/CD pipeline files
+
+# Allow feature teams to take ownership of their respective feature branches
+# This ensures teams responsible for specific features can manage their own code
+feature/* @feature-team
+
+# Restrict sensitive files to the repository owner
+# These are critical files that need extra protection to prevent accidental or unauthorized changes
+*.env @colson0x1
+*.pem @colson0x1
+secrets/* @colson0x1  # Files in the secrets folder are highly sensitive
